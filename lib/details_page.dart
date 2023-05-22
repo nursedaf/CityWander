@@ -18,6 +18,7 @@ class _DetailsPageState extends State<DetailsPage> {
     super.initState();
   }
 
+  final RouteList routeList = RouteList();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +36,7 @@ class _DetailsPageState extends State<DetailsPage> {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Color.fromARGB(255, 9, 95, 12),
         onPressed: () {
-          addPlace(widget.place);
+        routeList.addPlace(widget.place);
         },
         label: const Text('Add to Route'),
       ),
@@ -43,8 +44,14 @@ class _DetailsPageState extends State<DetailsPage> {
   }
 }
 
-Map<String, Place> PlaceMap = {};
-void addPlace(Place provider) {
-  PlaceMap[provider.name] = provider;
-  print(PlaceMap[provider.name]?.name);
+class RouteList {
+  Map<String, Place> PlaceMap = {};
+  void addPlace(Place place) {
+    PlaceMap[place.name] = place;
+    print(PlaceMap[place.name]?.name);
+  }
+
+  Map<String, Place> GetPlaceMap() {
+    return PlaceMap;
+  }
 }

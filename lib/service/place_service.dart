@@ -7,7 +7,7 @@ class PlaceService {
   Future<List<Place>> getPlace(String cityName) async {
     var headers = {'Content-Type': 'application/json'};
     var request =
-        http.Request('POST', Uri.parse('http://10.100.128.88/travel_api/'));
+        http.Request('POST', Uri.parse('http://nursedaf.com/travel_api/'));
     request.body = json.encode({
       "name": "places_in_city",
       "param": {"city_name": cityName}

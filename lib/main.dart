@@ -96,32 +96,28 @@ class MapSampleState extends State<MapSample> {
             children: [
               Row(
                 children: [
-                  Expanded(
-                      child: TextFormField(
-                    controller: _searchController,
-                    textCapitalization: TextCapitalization.words,
-                    decoration:
-                        const InputDecoration(hintText: ' Seach by City'),
-                    onChanged: (value) {
-                      print(value);
-                    },
-                  )),
+                  IconButton(
+                    icon: Icon(Icons.arrow_drop_down_circle),
+                    onPressed: () {},
+                    iconSize: 24,
+                  )
                 ],
               ),
               Expanded(
-                  child: GoogleMap(
-                mapType: MapType.normal,
-                markers: _markers,
-                polygons: _polygons,
-                initialCameraPosition: _kGooglePlex,
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                  location.getLocation().then((value) {
-                    LocationService().getCurrentCityName(value, providerData);
-                    _goToCurrentLocation(value.latitude, value.longitude);
-                  });
-                },
-              )),
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  markers: _markers,
+                  polygons: _polygons,
+                  initialCameraPosition: _kGooglePlex,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                    location.getLocation().then((value) {
+                      LocationService().getCurrentCityName(value, providerData);
+                      _goToCurrentLocation(value.latitude, value.longitude);
+                    });
+                  },
+                ),
+              ),
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(

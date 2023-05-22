@@ -75,7 +75,7 @@ class _PlaceListState extends State<PlaceList> {
             }));
   }
 
-  openPage(context, Place place) {
+  static openPage(context, Place place) {
     Navigator.push(
         context,
         MaterialPageRoute(
