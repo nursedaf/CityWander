@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:citywander/maps.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -10,10 +9,7 @@ import 'package:citywander/route.dart';
 import 'package:citywander/service/local_db.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
-import 'package:citywander/service/direction_service.dart';
 import 'selected_places.dart';
-import 'package:citywander/directions.dart';
-import 'service/directions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,11 +78,11 @@ class MapSampleState extends State<MapSample> {
               backgroundColor: Colors.green[700],
               actions: <Widget>[
                 Container(
-                  child: Text('Places'),
                   alignment: Alignment.center,
+                  child: const Text('Places'),
                 ),
                 IconButton(
-                  icon: Icon(Icons.account_balance),
+                  icon: const Icon(Icons.account_balance),
                   onPressed: () {
                     location.getLocation().then((value) {
                       LocationService().getCurrentCityName(value, providerData);

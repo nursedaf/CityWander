@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocaleDbManager {
@@ -68,7 +69,6 @@ class LocaleDbManager {
 
   Future<void> deleteRoute(LatLng value) async {
     List<LatLng>? routes = getLocations();
-
     if (routes != null && routes.contains(value)) {
       routes.remove(value);
       await addRoutes(routes);
@@ -77,6 +77,7 @@ class LocaleDbManager {
 
   void addPlaceToMap(String placeName, LatLng latLng) async {
     String? placeMapString = _preferences?.getString('placeMap');
+
     Map<String, dynamic>? placeMap;
     try {
       placeMap = placeMapString != null ? jsonDecode(placeMapString) : {};
@@ -101,6 +102,7 @@ class LocaleDbManager {
     } catch (e) {
       placeMap = {};
     }
+
     print(placeMap);
     return placeMap!;
   }

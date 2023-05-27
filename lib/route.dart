@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
+import 'package:citywander/service/local_db.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'service/directions.dart';
 
 class RoutePage extends StatefulWidget {
@@ -14,7 +16,7 @@ class RoutePage extends StatefulWidget {
 class _RoutePageState extends State<RoutePage> {
   Completer<GoogleMapController> _controller = Completer();
   static final CameraPosition _kGoogle = const CameraPosition(
-    target: LatLng(37.96602796331482, 29.102725876321294),
+    target: LatLng(37.7562, 29.0848),
     zoom: 15,
   );
 
@@ -38,33 +40,27 @@ class _RoutePageState extends State<RoutePage> {
   }
 
   void setmarker() {
-    for (int i = 0; i < latLen.length; i++) {
-      _markers.add(
-          // added markers
-          Marker(
-        markerId: const MarkerId('marker'),
-        position: latLen[i],
-        /*infoWindow: InfoWindow(
-          title: 'HOTEL',
-          snippet: '5 Star Hotel',
-        ),*/
-        icon: BitmapDescriptor.defaultMarker,
-      ));
-      setState(() {});
-      _polyline.add(Polyline(
-        polylineId: PolylineId('route'),
-        points: latLen,
-        color: Colors.green,
-      ));
-    }
-    /*List<LatLng> latLen = [
-    LatLng(19.0759837, 72.8776559),
-    LatLng(28.679079, 77.069710),
-    LatLng(26.850000, 80.949997),
-    LatLng(24.879999, 74.629997),
-    LatLng(16.166700, 74.833298),
-    LatLng(12.971599, 77.594563),
-  ];*/
+    setState(() {
+      var selectedPlaces = LocaleDbManager.instance.getLocations();
+      for (int i = 0; i < selectedPlaces!.length; i++) {
+        _markers.add(Marker(
+          markerId: MarkerId(i.toString()),
+          position: selectedPlaces![i],
+          infoWindow: InfoWindow(
+            title: 'Marker Title',
+            snippet: 'Marker Snippet',
+          ),
+          icon: BitmapDescriptor.defaultMarker,
+        ));
+
+        _polyline.add(Polyline(
+          polylineId: PolylineId('route'),
+          points: latLen,
+          color: Color.fromARGB(255, 0, 174, 255),
+          width: 5,
+        ));
+      }
+    });
   }
 
   @override

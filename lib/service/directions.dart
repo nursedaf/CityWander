@@ -4,8 +4,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'local_db.dart';
+import 'package:location/location.dart';
 
 class Directions {
+  static const String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
+
   static Future<List<LatLng>> getDirections() async {
     List<LatLng>? latLngList = LocaleDbManager.instance.getLocations();
     List<double> latitudes = [];
@@ -19,11 +22,20 @@ class Directions {
       print("Rotaya hiçbir yer eklenmedi.");
       return routeSteps;
     } else {
+      var start = await Location().getLocation();
+      latitudes.insert(0, start.latitude ?? 0);
+      longitudes.insert(0, start.longitude ?? 0);
       String origin = '${latitudes.first},${longitudes.first}';
       String destination = '${latitudes.last},${longitudes.last}';
-      //waypoints eklicemm
+      String waypoints = '';
+
+      if (latitudes.length > 2 && longitudes.length > 2) {
+        for (int i = 1; i < latitudes.length - 1; i++) {
+          waypoints += '${latitudes[i]},${longitudes[i]}|';
+        }
+      }
       String apiUrl =
-          'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
+          'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&waypoints=optimize:true|$waypoints&key=$apiKey';
 
       http.Response response = await http.get(Uri.parse(apiUrl));
 
