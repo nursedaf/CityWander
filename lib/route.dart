@@ -34,7 +34,6 @@ class _RoutePageState extends State<RoutePage> {
     var futureCoordinates = await Directions.getDirections();
     for (var coordinate in futureCoordinates) {
       latLen.add(coordinate);
-      print(latLen);
     }
     setmarker();
   }
@@ -52,7 +51,6 @@ class _RoutePageState extends State<RoutePage> {
           ),
           icon: BitmapDescriptor.defaultMarker,
         ));
-
         _polyline.add(Polyline(
           polylineId: PolylineId('route'),
           points: latLen,

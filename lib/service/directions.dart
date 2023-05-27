@@ -38,7 +38,6 @@ class Directions {
           'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&waypoints=optimize:true|$waypoints&key=$apiKey';
 
       http.Response response = await http.get(Uri.parse(apiUrl));
-
       if (response.statusCode == 200) {
         var decodedJson = json.decode(response.body);
         List<LatLng> route = _decodePolylinePoints(

@@ -10,6 +10,7 @@ import 'package:citywander/service/local_db.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
 import 'selected_places.dart';
+import 'service/directions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -42,8 +42,10 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  final Set<Marker> _markers = <Marker>{};
-  late List<LatLng> routeSteps = [];
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polyline = {};
+
+  late List<LatLng> latLen = [];
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(39.920611, 32.853762),
@@ -53,14 +55,38 @@ class MapSampleState extends State<MapSample> {
   @override
   void initState() {
     super.initState();
+    future();
   }
 
-  void _setMarker(LatLng point) {
+  Future<void> future() async {
+    var futureCoordinates = await Directions.getDirections();
+    latLen.clear();
+    for (var coordinate in futureCoordinates) {
+      latLen.add(coordinate);
+    }
+    setmarker();
+  }
+
+  void setmarker() {
     setState(() {
-      _markers.add(Marker(
-        markerId: const MarkerId('marker'),
-        position: point,
-      ));
+      var selectedPlaces = LocaleDbManager.instance.getLocations();
+      for (int i = 0; i < selectedPlaces!.length; i++) {
+        _markers.add(Marker(
+          markerId: MarkerId(i.toString()),
+          position: selectedPlaces![i],
+          infoWindow: InfoWindow(
+            title: 'Marker Title',
+            snippet: 'Marker Snippet',
+          ),
+          icon: BitmapDescriptor.defaultMarker,
+        ));
+        _polyline.add(Polyline(
+          polylineId: PolylineId('route'),
+          points: latLen,
+          color: Color.fromARGB(255, 0, 174, 255),
+          width: 5,
+        ));
+      }
     });
   }
 
@@ -86,10 +112,10 @@ class MapSampleState extends State<MapSample> {
                   onPressed: () {
                     location.getLocation().then((value) {
                       LocationService().getCurrentCityName(value, providerData);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const PlaceList()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const PlaceList();
+                      }));
                     });
                   },
                   iconSize: 24,
@@ -102,10 +128,10 @@ class MapSampleState extends State<MapSample> {
                   IconButton(
                     icon: const Icon(Icons.navigation),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SelectedPlaces()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const SelectedPlaces();
+                      }));
                     },
                     iconSize: 24,
                   ),
@@ -113,53 +139,33 @@ class MapSampleState extends State<MapSample> {
                     alignment: Alignment.center,
                     child: const Text('Selected Places'),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.directions),
-                    onPressed: () async {
-                      log(LocaleDbManager.instance.getLocations().toString());
-                      /*routeSteps = await GoogleDirectionsAPI()
-                          .getRoute(LocaleDbManager.instance.getLocations());
-                      navigateToRoutePage(routeSteps);*/
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RoutePage(),
-                        ),
-                      );
-                    },
-                    iconSize: 24,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: const Text('Rotayı Gör'),
-                  ),
                 ],
               ),
               Expanded(
-                child: GoogleMap(
-                  mapType: MapType.normal,
-                  markers: _markers,
-                  initialCameraPosition: _kGooglePlex,
-                  onMapCreated: (GoogleMapController controller) {
-                    _controller.complete(controller);
-                    location.getLocation().then((value) {
-                      LocationService().getCurrentCityName(value, providerData);
-                      _goToCurrentLocation(value.latitude, value.longitude);
-                    });
-                  },
+                child: Container(
+                  child: SafeArea(
+                    child: GoogleMap(
+                      initialCameraPosition: _kGooglePlex,
+                      mapType: MapType.normal,
+                      markers: _markers,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: true,
+                      compassEnabled: true,
+                      polylines: _polyline,
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                        location.getLocation().then((value) {
+                          LocationService()
+                              .getCurrentCityName(value, providerData);
+                          _goToCurrentLocation(value.latitude, value.longitude);
+                        });
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
-              backgroundColor: Colors.green[500],
-              onPressed: () {
-                location.getLocation().then((value) {
-                  LocationService().getCurrentCityName(value, providerData);
-                  _goToCurrentLocation(value.latitude, value.longitude);
-                });
-              },
-              label: const Text('Current Location')),
         ));
   }
 
@@ -167,6 +173,6 @@ class MapSampleState extends State<MapSample> {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: LatLng(latitude!, longitude!), zoom: 15)));
-    _setMarker(LatLng(latitude, longitude));
+    //_setMarker(LatLng(latitude, longitude));
   }
 }

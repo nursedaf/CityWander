@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:citywander/service/local_db.dart';
 
+import 'main.dart';
+
 class SelectedPlaces extends StatefulWidget {
   const SelectedPlaces({super.key});
 
@@ -77,8 +79,14 @@ class _SelectedPlaces extends State<SelectedPlaces> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: Colors.green[500],
-          onPressed: () {},
-          label: const Text('Create Route'),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyApp(),
+                ));
+          },
+          label: const Text('Show on Map'),
         ));
   }
 }
