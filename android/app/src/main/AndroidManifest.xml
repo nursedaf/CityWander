@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nurseda.travelapp_1">
+    package="com.nurseda.citywander">
    <application
-        android:label="travelapp_1"
+        android:label="citywander"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

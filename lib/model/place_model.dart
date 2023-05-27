@@ -3,11 +3,12 @@ class Place {
   final String info;
   final String lat;
   final String lng;
-  const Place(
-      {required this.name,
-      required this.info,
-      required this.lat,
-      required this.lng});
+  Place({
+    required this.name,
+    required this.info,
+    required this.lat,
+    required this.lng,
+  });
 
   factory Place.fromJson(Map<String, dynamic> json) {
     return Place(

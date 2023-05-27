@@ -1,4 +1,4 @@
-package com.nurseda.travelapp_1
+package com.nurseda.citywander
 
 import io.flutter.embedding.android.FlutterActivity
 

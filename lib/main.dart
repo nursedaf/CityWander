@@ -1,14 +1,23 @@
 import 'dart:async';
+import 'dart:developer';
+import 'package:citywander/maps.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:maps_8/place_list.dart';
-import 'package:maps_8/providers/provider_data.dart';
-import 'package:maps_8/service/locationiq_serice.dart';
-import 'package:maps_8/model/cityname_model.dart';
+import 'package:citywander/place_list.dart';
+import 'package:citywander/providers/provider_data.dart';
+import 'package:citywander/route.dart';
+import 'package:citywander/service/local_db.dart';
+import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
+import 'package:citywander/service/direction_service.dart';
+import 'selected_places.dart';
+import 'package:citywander/directions.dart';
+import 'service/directions.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocaleDbManager.prefInit();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ProviderData()),
   ], child: const MyApp()));
@@ -37,12 +46,8 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  final TextEditingController _searchController = TextEditingController();
-
   final Set<Marker> _markers = <Marker>{};
-  final Set<Polygon> _polygons = <Polygon>{};
-  final List<LatLng> _polygonLatLngs = <LatLng>[];
-  final int _polygonIdCounter = 1;
+  late List<LatLng> routeSteps = [];
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(39.920611, 32.853762),
@@ -57,7 +62,7 @@ class MapSampleState extends State<MapSample> {
   void _setMarker(LatLng point) {
     setState(() {
       _markers.add(Marker(
-        markerId: MarkerId('marker'),
+        markerId: const MarkerId('marker'),
         position: point,
       ));
     });
@@ -85,8 +90,10 @@ class MapSampleState extends State<MapSample> {
                   onPressed: () {
                     location.getLocation().then((value) {
                       LocationService().getCurrentCityName(value, providerData);
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => PlaceList()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PlaceList()));
                     });
                   },
                   iconSize: 24,
@@ -97,17 +104,45 @@ class MapSampleState extends State<MapSample> {
               Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_drop_down_circle),
-                    onPressed: () {},
+                    icon: const Icon(Icons.navigation),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SelectedPlaces()));
+                    },
                     iconSize: 24,
-                  )
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: const Text('Selected Places'),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.directions),
+                    onPressed: () async {
+                      log(LocaleDbManager.instance.getLocations().toString());
+                      /*routeSteps = await GoogleDirectionsAPI()
+                          .getRoute(LocaleDbManager.instance.getLocations());
+                      navigateToRoutePage(routeSteps);*/
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RoutePage(),
+                        ),
+                      );
+                    },
+                    iconSize: 24,
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: const Text('Rotayı Gör'),
+                  ),
                 ],
               ),
               Expanded(
                 child: GoogleMap(
                   mapType: MapType.normal,
                   markers: _markers,
-                  polygons: _polygons,
                   initialCameraPosition: _kGooglePlex,
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);

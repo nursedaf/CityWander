@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:maps_8/model/cityname_model.dart';
-
 import '../providers/provider_data.dart';
 
 class LocationService {

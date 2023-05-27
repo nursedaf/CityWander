@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:maps_8/details_page.dart';
-import 'package:maps_8/providers/provider_data.dart';
-import 'package:maps_8/service/place_service.dart';
-import 'package:maps_8/model/place_model.dart';
-import 'package:maps_8/main.dart';
+import 'package:citywander/details_page.dart';
+import 'package:citywander/providers/provider_data.dart';
+import 'package:citywander/service/place_service.dart';
+import 'package:citywander/model/place_model.dart';
 import 'package:provider/provider.dart';
 
 class PlaceList extends StatefulWidget {
@@ -59,9 +57,8 @@ class _PlaceListState extends State<PlaceList> {
                       },
                     );
                   } else if (snapshot.hasError) {
-                    return Text('Hiç gezilecek yer bulunamadı.');
+                    return const Text('Hiç gezilecek yer bulunamadı.');
                   }
-
                   return const CircularProgressIndicator();
                 },
               ),

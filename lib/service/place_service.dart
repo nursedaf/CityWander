@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:maps_8/model/place_model.dart';
+import 'package:citywander/model/place_model.dart';
 
 class PlaceService {
   Future<List<Place>> getPlace(String cityName) async {

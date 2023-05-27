@@ -8,4 +8,5 @@ class ProviderData extends ChangeNotifier {
     _placeName = value;
     notifyListeners();
   }
+
 }

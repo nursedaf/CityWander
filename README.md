@@ -1,4 +1,4 @@
-# travelapp_1
+# citywander
 
 A new Flutter project.
 

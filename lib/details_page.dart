@@ -1,8 +1,10 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:maps_8/model/place_model.dart';
-import 'package:maps_8/providers/provider_data.dart';
-import 'package:provider/provider.dart';
-import 'package:maps_8/providers/provider_list.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:citywander/model/place_model.dart';
+import 'package:citywander/service/local_db.dart';
 
 class DetailsPage extends StatefulWidget {
   final Place place;
@@ -13,18 +15,19 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
+  List<LatLng> routes = [];
   @override
   void initState() {
     super.initState();
+    routes = LocaleDbManager.instance.getLocations() ?? [];
   }
 
-  final RouteList routeList = RouteList();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 9, 95, 12),
-        title: Text('${widget.place.name}'),
+        backgroundColor: const Color.fromARGB(255, 9, 95, 12),
+        title: Text(widget.place.name),
       ),
       body: Center(
           child: Column(children: [
@@ -34,24 +37,27 @@ class _DetailsPageState extends State<DetailsPage> {
         Text(widget.place.info)
       ])),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Color.fromARGB(255, 9, 95, 12),
+        backgroundColor: const Color.fromARGB(255, 9, 95, 12),
         onPressed: () {
-        routeList.addPlace(widget.place);
+          selected(widget.place);
         },
         label: const Text('Add to Route'),
       ),
     );
   }
-}
 
-class RouteList {
-  Map<String, Place> PlaceMap = {};
-  void addPlace(Place place) {
-    PlaceMap[place.name] = place;
-    print(PlaceMap[place.name]?.name);
-  }
-
-  Map<String, Place> GetPlaceMap() {
-    return PlaceMap;
+  void selected(Place place) {
+    Place selectedPlace = Place(
+      name: place.name,
+      lat: place.lat,
+      lng: place.lng,
+      info: place.info,
+    );
+    LocaleDbManager.instance.addPlaceToMap(
+        selectedPlace.name,
+        LatLng(
+            double.parse(selectedPlace.lat), double.parse(selectedPlace.lng)));
+    LocaleDbManager.instance.addRoute(LatLng(
+        double.parse(selectedPlace.lat), double.parse(selectedPlace.lng)));
   }
 }
