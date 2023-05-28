@@ -54,7 +54,7 @@ class _RoutePageState extends State<RoutePage> {
         _polyline.add(Polyline(
           polylineId: PolylineId('route'),
           points: latLen,
-          color: Color.fromARGB(255, 0, 174, 255),
+          color: Color.fromARGB(255, 54, 18, 186),
           width: 5,
         ));
       }
@@ -65,9 +65,9 @@ class _RoutePageState extends State<RoutePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF0F9D58),
+        backgroundColor: Colors.green[700],
         // title of app
-        title: Text("Route"),
+        title: Text("Your Route"),
       ),
       body: Container(
         child: SafeArea(

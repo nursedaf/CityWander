@@ -73,7 +73,7 @@ class MapSampleState extends State<MapSample> {
       for (int i = 0; i < selectedPlaces!.length; i++) {
         _markers.add(Marker(
           markerId: MarkerId(i.toString()),
-          position: selectedPlaces![i],
+          position: selectedPlaces[i],
           infoWindow: InfoWindow(
             title: 'Marker Title',
             snippet: 'Marker Snippet',
@@ -83,7 +83,7 @@ class MapSampleState extends State<MapSample> {
         _polyline.add(Polyline(
           polylineId: PolylineId('route'),
           points: latLen,
-          color: Color.fromARGB(255, 0, 174, 255),
+          color: Color.fromARGB(255, 54, 18, 186),
           width: 5,
         ));
       }
@@ -100,16 +100,30 @@ class MapSampleState extends State<MapSample> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
-              title: const Text('Maps'),
-              backgroundColor: Colors.green[700],
-              actions: <Widget>[
-                Container(
-                  alignment: Alignment.center,
-                  child: const Text('Places'),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.account_balance),
-                  onPressed: () {
+            title: const Text('CityWander'),
+            backgroundColor: Colors.green[700],
+            actions: [
+              PopupMenuButton(
+                icon: const Icon(Icons.place),
+                position: PopupMenuPosition.under,
+                itemBuilder: (context) {
+                  return [
+                    const PopupMenuItem<int>(
+                      value: 0,
+                      child: Text("City Places List"),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 1,
+                      child: Text("Selected Places"),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 2,
+                      child: Text("Your Route"),
+                    ),
+                  ];
+                },
+                onSelected: (value) {
+                  if (value == 0) {
                     location.getLocation().then((value) {
                       LocationService().getCurrentCityName(value, providerData);
                       Navigator.push(context,
@@ -117,13 +131,24 @@ class MapSampleState extends State<MapSample> {
                         return const PlaceList();
                       }));
                     });
-                  },
-                  iconSize: 24,
-                )
-              ]),
+                  } else if (value == 1) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const SelectedPlaces();
+                    }));
+                  } else if (value == 2) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const RoutePage();
+                    }));
+                  }
+                },
+              ),
+            ],
+          ),
           body: Column(
             children: [
-              Row(
+              /*Row(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.navigation),
@@ -140,7 +165,7 @@ class MapSampleState extends State<MapSample> {
                     child: const Text('Selected Places'),
                   ),
                 ],
-              ),
+              ),*/
               Expanded(
                 child: Container(
                   child: SafeArea(

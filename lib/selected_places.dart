@@ -1,9 +1,11 @@
 import 'dart:developer';
+import 'package:citywander/route.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:citywander/service/local_db.dart';
 
 import 'main.dart';
+import 'place_list.dart';
 
 class SelectedPlaces extends StatefulWidget {
   const SelectedPlaces({super.key});
@@ -14,12 +16,23 @@ class SelectedPlaces extends StatefulWidget {
 
 class _SelectedPlaces extends State<SelectedPlaces> {
   late Future<Map<String, dynamic>> _placeMapFuture;
-  List<String> selectedPlaces = [];
 
   @override
   void initState() {
     super.initState();
+    _placeMapFuture = fetchData();
+  }
+
+  void removeAllItems() {
+    setState(() {
+      _placeMapFuture = Future.value({});
+    });
+  }
+
+  Future<Map<String, dynamic>> fetchData() async {
+    await Future.delayed(const Duration(milliseconds: 50));
     _placeMapFuture = LocaleDbManager.instance.getPlaceMap();
+    return _placeMapFuture;
   }
 
   @override
@@ -27,12 +40,13 @@ class _SelectedPlaces extends State<SelectedPlaces> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 9, 95, 12),
-          title: const Text('Your Route'),
+          title: const Text('Selected Places'),
           actions: [
             IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () {
                   LocaleDbManager.instance.clearAllValues();
+                  removeAllItems();
                 }),
           ],
         ),
@@ -47,7 +61,33 @@ class _SelectedPlaces extends State<SelectedPlaces> {
             } else {
               Map<String, dynamic>? placeMap = snapshot.data;
               if (placeMap == null || placeMap.isEmpty) {
-                return const Text('You have not selected any places yet.');
+                return Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'No locations have been added yet. Select places.',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return const PlaceList();
+                            }));
+                          },
+                          style: ButtonStyle(
+                            alignment: Alignment.centerLeft,
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              const Color.fromARGB(255, 9, 95, 12),
+                            ),
+                          ),
+                          child: const Text('Place List')),
+                    ],
+                  ),
+                );
               } else {
                 return ListView.builder(
                   itemCount: placeMap.length,
@@ -83,7 +123,7 @@ class _SelectedPlaces extends State<SelectedPlaces> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyApp(),
+                  builder: (context) => RoutePage(),
                 ));
           },
           label: const Text('Show on Map'),
