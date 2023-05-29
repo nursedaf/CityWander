@@ -6,15 +6,13 @@ import 'package:location/location.dart';
 import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
 import 'package:citywander/route.dart';
-import 'package:citywander/service/local_db.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
+import 'model/place_model.dart';
 import 'selected_places.dart';
-import 'service/directions.dart';
+import 'service/place_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await LocaleDbManager.prefInit();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ProviderData()),
   ], child: const MyApp()));
@@ -42,55 +40,43 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  final Set<Marker> _markers = {};
+  Set<Marker> _markers = {};
   final Set<Polyline> _polyline = {};
-
   late List<LatLng> latLen = [];
+  late Future<List<Place>> futurePlaces;
 
   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(39.920611, 32.853762),
+    target: LatLng(39.9334, 32.8597),
     zoom: 14.4746,
   );
 
-  @override
-  void initState() {
-    super.initState();
-    future();
-  }
-
-  Future<void> future() async {
-    var futureCoordinates = await Directions.getDirections();
-    latLen.clear();
-    for (var coordinate in futureCoordinates) {
-      latLen.add(coordinate);
-    }
-    setmarker();
-  }
-
-  void setmarker() {
-    setState(() {
-      var selectedPlaces = LocaleDbManager.instance.getLocations();
-      for (int i = 0; i < selectedPlaces!.length; i++) {
-        _markers.add(Marker(
-          markerId: MarkerId(i.toString()),
-          position: selectedPlaces[i],
-          infoWindow: InfoWindow(
-            title: 'Marker Title',
-            snippet: 'Marker Snippet',
-          ),
-          icon: BitmapDescriptor.defaultMarker,
-        ));
-        _polyline.add(Polyline(
-          polylineId: PolylineId('route'),
-          points: latLen,
-          color: Color.fromARGB(255, 54, 18, 186),
-          width: 5,
-        ));
-      }
+  Location location = Location();
+  void getCity(providerData) {
+    location.getLocation().then((value) async {
+      String? cityname =
+          await LocationService().getCurrentCityName(value, providerData);
+      _goToCurrentLocation(value.latitude, value.longitude);
+      _loadMarkers(cityname!);
     });
   }
 
-  Location location = Location();
+  Future<void> _loadMarkers(String? cityname) async {
+    final places = await PlaceService().getPlace(cityname!);
+    final markers = places.map((place) {
+      return Marker(
+        markerId: MarkerId(place.name),
+        position: LatLng(double.parse(place.lat), double.parse(place.lng)),
+        infoWindow: InfoWindow(
+          title: place.name,
+          //snippet: place.info,
+        ),
+      );
+    }).toSet();
+
+    setState(() {
+      _markers = markers;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,13 +110,11 @@ class MapSampleState extends State<MapSample> {
                 },
                 onSelected: (value) {
                   if (value == 0) {
-                    location.getLocation().then((value) {
-                      LocationService().getCurrentCityName(value, providerData);
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return const PlaceList();
-                      }));
-                    });
+                    getCity(providerData);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const PlaceList();
+                    }));
                   } else if (value == 1) {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
@@ -148,44 +132,20 @@ class MapSampleState extends State<MapSample> {
           ),
           body: Column(
             children: [
-              /*Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.navigation),
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return const SelectedPlaces();
-                      }));
-                    },
-                    iconSize: 24,
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: const Text('Selected Places'),
-                  ),
-                ],
-              ),*/
               Expanded(
-                child: Container(
-                  child: SafeArea(
-                    child: GoogleMap(
-                      initialCameraPosition: _kGooglePlex,
-                      mapType: MapType.normal,
-                      markers: _markers,
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: true,
-                      compassEnabled: true,
-                      polylines: _polyline,
-                      onMapCreated: (GoogleMapController controller) {
-                        _controller.complete(controller);
-                        location.getLocation().then((value) {
-                          LocationService()
-                              .getCurrentCityName(value, providerData);
-                          _goToCurrentLocation(value.latitude, value.longitude);
-                        });
-                      },
-                    ),
+                child: SafeArea(
+                  child: GoogleMap(
+                    initialCameraPosition: _kGooglePlex,
+                    mapType: MapType.normal,
+                    markers: _markers,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    compassEnabled: true,
+                    polylines: _polyline,
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                      getCity(providerData);
+                    },
                   ),
                 ),
               ),
