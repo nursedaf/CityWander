@@ -61,19 +61,21 @@ class MapSampleState extends State<MapSample> {
 
   Future<void> _loadMarkers(String? cityname) async {
     final places = await PlaceService().getPlace(cityname!);
-    final markers = places.map((place) {
-      return Marker(
-        markerId: MarkerId(place.name),
-        position: LatLng(double.parse(place.lat), double.parse(place.lng)),
-        infoWindow: InfoWindow(
-          title: place.name,
-          //snippet: place.info,
-        ),
-      );
-    }).toSet();
-    setState(() {
-      _markers = markers;
-    });
+    if (places.isNotEmpty) {
+      final markers = places.map((place) {
+        return Marker(
+          markerId: MarkerId(place.name),
+          position: LatLng(double.parse(place.lat), double.parse(place.lng)),
+          infoWindow: InfoWindow(
+            title: place.name,
+            //snippet: place.info,
+          ),
+        );
+      }).toSet();
+      setState(() {
+        _markers = markers;
+      });
+    }
   }
 
   @override

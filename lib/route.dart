@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'package:citywander/main.dart';
 import 'package:citywander/service/local_db.dart';
 import 'package:flutter/material.dart';

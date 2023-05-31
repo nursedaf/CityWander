@@ -57,10 +57,10 @@ class _PlaceListState extends State<PlaceList> {
                         );
                       },
                     );
-                  } else if (snapshot.hasError) {
-                    return const Text('Hiç gezilecek yer bulunamadı.');
+                  } else {
+                    return const Text('No places to visit found.');
                   }
-                  return const CircularProgressIndicator();
+                  //return const CircularProgressIndicator();
                 },
               ),
             ),

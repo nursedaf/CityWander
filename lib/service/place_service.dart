@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:citywander/model/place_model.dart';
@@ -18,9 +19,11 @@ class PlaceService {
       var jsonArray = jsonDecode(data);
       //debugPrint(jsonArray.toString());
       final List<Place> list = [];
-      for (var i = 0; i < jsonArray["results"].length; i++) {
-        final entry = jsonArray["results"][i];
-        list.add(Place.fromJson(entry));
+      if (jsonArray["results"] != null) {
+        for (var i = 0; i < jsonArray["results"].length; i++) {
+          final entry = jsonArray["results"][i];
+          list.add(Place.fromJson(entry));
+        }
       }
       return list;
     } else {
