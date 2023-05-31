@@ -1,7 +1,9 @@
+import 'package:citywander/service/locationiq_serice.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:citywander/model/place_model.dart';
+import 'package:location/location.dart';
 
 class PlaceService {
   Future<List<Place>> getPlace(String cityName) async {
@@ -12,6 +14,7 @@ class PlaceService {
       "name": "places_in_city",
       "param": {"city_name": cityName}
     });
+
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {

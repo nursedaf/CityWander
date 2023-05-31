@@ -1,9 +1,11 @@
 import 'package:citywander/main.dart';
+import 'package:citywander/service/locationiq_serice.dart';
 import 'package:flutter/material.dart';
 import 'package:citywander/details_page.dart';
 import 'package:citywander/providers/provider_data.dart';
 import 'package:citywander/service/place_service.dart';
 import 'package:citywander/model/place_model.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 class PlaceList extends StatefulWidget {
@@ -13,16 +15,26 @@ class PlaceList extends StatefulWidget {
 }
 
 class _PlaceListState extends State<PlaceList> {
-  late Future<List<Place>> futurePlaces;
+  Future<List<Place>>? futurePlaces;
 
   ProviderData? providerData;
-
+  String? title;
   @override
   void initState() {
-    providerData = Provider.of(context, listen: false);
-
     super.initState();
-    futurePlaces = PlaceService().getPlace(getCityName(providerData));
+    providerData = Provider.of(context, listen: false);
+    //  futurePlaces = PlaceService().getPlace(getCityName(providerData));
+    update();
+  }
+
+  Future<void> update() async {
+    var location = await Location().getLocation();
+    var cityName =
+        await LocationService().getCurrentCityName(location, providerData!);
+    setState(() {
+      title = cityName;
+      futurePlaces = PlaceService().getPlace(cityName!);
+    });
   }
 
   String getCityName(ProviderData? data) {
@@ -33,7 +45,7 @@ class _PlaceListState extends State<PlaceList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(getCityName(providerData)),
+          title: Text(title ?? "Loading..."),
           backgroundColor: Colors.green[700],
         ),
         body: RefreshIndicator(
@@ -58,7 +70,8 @@ class _PlaceListState extends State<PlaceList> {
                       },
                     );
                   } else {
-                    return const Text('No places to visit found.');
+                    return const CircularProgressIndicator();
+                    // return const Text('No places to visit found.');
                   }
                   //return const CircularProgressIndicator();
                 },

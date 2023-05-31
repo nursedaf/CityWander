@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart';
 import 'package:location/location.dart';
 import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
@@ -49,16 +51,12 @@ class MapSampleState extends State<MapSample> {
     zoom: 14.4746,
   );
 
-  Location location = Location();
-  void getCity(providerData) {
-    location.getLocation().then((value) async {
-      String? cityname =
-          await LocationService().getCurrentCityName(value, providerData);
-      _goToCurrentLocation(value.latitude, value.longitude);
-      _loadMarkers(cityname!);
-    });
+  @override
+  void initState() {
+    super.initState();
   }
 
+  Location location = Location();
   Future<void> _loadMarkers(String? cityname) async {
     final places = await PlaceService().getPlace(cityname!);
     if (places.isNotEmpty) {
@@ -92,7 +90,7 @@ class MapSampleState extends State<MapSample> {
               PopupMenuButton(
                 icon: const Icon(Icons.place),
                 position: PopupMenuPosition.under,
-                itemBuilder: (context) {
+                itemBuilder: (context1) {
                   return [
                     const PopupMenuItem<int>(
                       value: 0,
@@ -110,7 +108,6 @@ class MapSampleState extends State<MapSample> {
                 },
                 onSelected: (value) {
                   if (value == 0) {
-                    getCity(providerData);
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
                       return const PlaceList();
@@ -146,7 +143,12 @@ class MapSampleState extends State<MapSample> {
                     polylines: _polyline,
                     onMapCreated: (GoogleMapController controller) {
                       _controller.complete(controller);
-                      getCity(providerData);
+                      location.getLocation().then((value) async {
+                        String? cityname = await LocationService()
+                            .getCurrentCityName(value, providerData);
+                        _goToCurrentLocation(value.latitude, value.longitude);
+                        _loadMarkers(cityname);
+                      });
                     },
                   ),
                 ),
