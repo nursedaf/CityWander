@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'local_db.dart';
 import 'package:location/location.dart';
 
@@ -34,6 +35,7 @@ class Directions {
           waypoints += '${latitudes[i]},${longitudes[i]}|';
         }
       }
+
       String apiUrl =
           'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&waypoints=optimize:true|$waypoints&key=$apiKey';
 

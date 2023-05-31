@@ -1,10 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:citywander/model/place_model.dart';
-
-import 'local_db.dart';
 
 class PlaceService {
   Future<List<Place>> getPlace(String cityName) async {

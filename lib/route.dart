@@ -12,6 +12,7 @@ import 'providers/provider_data.dart';
 import 'selected_places.dart';
 import 'service/directions.dart';
 import 'service/locationiq_serice.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RoutePage extends StatefulWidget {
   const RoutePage({Key? key}) : super(key: key);
@@ -145,6 +146,8 @@ class _RoutePageState extends State<RoutePage> {
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               compassEnabled: true,
+              mapToolbarEnabled: true,
+              zoomGesturesEnabled: true,
               markers: markers,
               polylines: _polyline,
               onMapCreated: (GoogleMapController controller) {
@@ -154,6 +157,34 @@ class _RoutePageState extends State<RoutePage> {
           }
         },
       ),
+      floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: Colors.green[500],
+          onPressed: () async {
+            openGoogleMapsAppWithWaypoints();
+          },
+          label: const Text('Go Google Maps')),
     );
+  }
+}
+
+void openGoogleMapsAppWithWaypoints() async {
+  var waypoints = LocaleDbManager.instance.getLocations();
+  String origin = '${waypoints!.first.latitude},${waypoints.first.longitude}';
+  String destination = '${waypoints.last.latitude},${waypoints.last.longitude}';
+
+  List<String> waypointCoordinates = waypoints
+      .sublist(1, waypoints.length - 1)
+      .map((LatLng waypoint) => '${waypoint.latitude},${waypoint.longitude}')
+      .toList();
+
+  String waypointsStr = waypointCoordinates.join('|');
+  String url =
+      'https://www.google.com/maps/dir/?api=1&origin=$origin&destination=$destination&waypoints=&waypoints=optimize:true|$waypoints';
+  Uri uri = Uri.parse(url);
+
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  } else {
+    throw 'Could not launch $url';
   }
 }

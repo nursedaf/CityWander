@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -72,7 +71,6 @@ class MapSampleState extends State<MapSample> {
         ),
       );
     }).toSet();
-
     setState(() {
       _markers = markers;
     });
@@ -141,6 +139,8 @@ class MapSampleState extends State<MapSample> {
                     myLocationEnabled: true,
                     myLocationButtonEnabled: true,
                     compassEnabled: true,
+                    mapToolbarEnabled: true,
+                    zoomGesturesEnabled: true,
                     polylines: _polyline,
                     onMapCreated: (GoogleMapController controller) {
                       _controller.complete(controller);
