@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:citywander/model/place_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Actions/ObserverActions.dart';
 class LocaleDbManager {
   static final LocaleDbManager _instance = LocaleDbManager._init();
-
   SharedPreferences? _preferences;
   static LocaleDbManager get instance => _instance;
   LocaleDbManager._init() {
@@ -91,6 +89,7 @@ class LocaleDbManager {
     };
 
     await _preferences?.setString('placeMap', jsonEncode(placeMap));
+    ObserverActions.instance.placeListChangeNotifier.notifyListeners();
     print('Place added to the map: $placeName');
     print(placeMap);
   }

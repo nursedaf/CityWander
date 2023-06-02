@@ -27,7 +27,7 @@ class _RoutePageState extends State<RoutePage> {
     zoom: 14.4746,
   );
   late Future<Set<Marker>> _markersFuture;
-  late Set<Marker> _markers = {};
+  late final Set<Marker> _markers = {};
   final Set<Polyline> _polyline = {};
   late List<LatLng> latLen = [];
   final List<Place> list = [];
@@ -138,7 +138,7 @@ class _RoutePageState extends State<RoutePage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            final markers = snapshot.data ?? Set<Marker>();
+            final markers = snapshot.data ?? <Marker>{};
             return GoogleMap(
               initialCameraPosition: _kGoogle,
               mapType: MapType.normal,

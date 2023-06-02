@@ -1,9 +1,6 @@
-import 'package:citywander/service/locationiq_serice.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:citywander/model/place_model.dart';
-import 'package:location/location.dart';
 
 class PlaceService {
   Future<List<Place>> getPlace(String cityName) async {

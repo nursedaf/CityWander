@@ -1,17 +1,15 @@
 import 'dart:async';
 
 import 'package:citywander/service/directions.dart';
-import 'package:citywander/service/local_db.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-import 'service/locationiq_serice.dart';
 
 class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
+
   @override
   _MapScreenState createState() => _MapScreenState();
 }
@@ -70,7 +68,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Map'),
+        title: const Text('Map'),
       ),
       body: GoogleMap(
         onMapCreated: (GoogleMapController controller) {
@@ -84,7 +82,7 @@ class _MapScreenState extends State<MapScreen> {
         ),
         polylines: {
           Polyline(
-            polylineId: PolylineId('route'),
+            polylineId: const PolylineId('route'),
             color: Colors.blue,
             points: _points,
             width: 5,

@@ -1,4 +1,3 @@
-import 'package:citywander/main.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:flutter/material.dart';
 import 'package:citywander/details_page.dart';
