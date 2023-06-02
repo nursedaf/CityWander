@@ -28,7 +28,6 @@ class _SelectedPlaces extends State<SelectedPlaces> {
   }
 
   Future<Map<String, dynamic>> fetchData() async {
-    await Future.delayed(const Duration(milliseconds: 50));
     _placeMapFuture = LocaleDbManager.instance.getPlaceMap();
     return _placeMapFuture;
   }

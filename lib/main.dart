@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:ffi';
+import 'dart:math';
 import 'package:citywander/service/directions.dart';
 import 'package:citywander/service/local_db.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,8 @@ import 'model/place_model.dart';
 import 'selected_places.dart';
 import 'service/place_service.dart';
 
+  var _waitMapComplete=false;
+    var random=Random();
 void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ProviderData()),
@@ -44,7 +48,7 @@ class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   Set<Marker> _markers = {};
-  final Set<Polyline> _polyline = {};
+   Set<Polyline> _polyline = {};
   late List<LatLng> latLen = [];
   late Future<List<Place>> futurePlaces;
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -55,10 +59,13 @@ class MapSampleState extends State<MapSample> {
   void initState() {
     super.initState();
     future();
+    ObserverActions.instance.placeListChangeNotifier.removeListener(placeListChanged);
     ObserverActions.instance.placeListChangeNotifier.addListener(placeListChanged);
   }
 
 Future<void> future() async {
+  _waitMapComplete=true;
+  try{
     var futureCoordinates = await Directions.getDirections();
     for (var coordinate in futureCoordinates) {
       latLen.add(coordinate);
@@ -66,33 +73,39 @@ Future<void> future() async {
     await setMarkersFromSelectedPlaces();
     setPolyline();
   }
+  catch(e){
+    print("Future Problem");
+  }
+    _waitMapComplete=false;
+  }
  void setPolyline() {
-    setState(() {
-      var selectedPlaces = LocaleDbManager.instance.getLocations();
-      for (int i = 0; i < selectedPlaces!.length; i++) {
+  var selectedPlaces = LocaleDbManager.instance.getLocations();
+     for (int i = 0; i < selectedPlaces!.length; i++) {
         String id = i.toString();
         _polyline.add(Polyline(
-          polylineId: PolylineId('route$id'),
+          polylineId: PolylineId('route'+random.nextInt(100).toString()),
           points: latLen,
           color: const Color.fromARGB(255, 54, 18, 186),
           width: 5,
         ));
       }
+    setState(() {
     });
   } 
    Future<void> setMarkersFromSelectedPlaces() async {
     Future<Map<String, dynamic>> selectedPlaces =
         LocaleDbManager.instance.getPlaceMap();
     var placeMap = await selectedPlaces;
-
     placeMap.forEach((placeName, placeData) {
       final latitude = placeData['latitude'];
       final longitude = placeData['longitude'];
       _markers.add(Marker(
-        markerId: MarkerId(placeName),
+        markerId: MarkerId(placeName+random.nextInt(100).toString()),
         position: LatLng(latitude, longitude),
         infoWindow: InfoWindow(title: placeName),
       ));
+    });
+    setState(() {
     });
   }
   Location location = Location();
@@ -105,39 +118,6 @@ Future<void> future() async {
           appBar: AppBar(
             title: const Text('CityWander'),
             backgroundColor: Colors.green[700],
-            actions: [
-              PopupMenuButton(
-                icon: const Icon(Icons.place),
-                position: PopupMenuPosition.under,
-                itemBuilder: (context1) {
-                  return [
-                    const PopupMenuItem<int>(
-                      value: 1,
-                      child: Text("Selected Places"),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 2,
-                      child: Text("Your Route"),
-                    ),
-                  ];
-                },
-                onSelected: (value) {
-                  if (value == 0) {
-                   
-                  } else if (value == 1) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const SelectedPlaces();
-                    }));
-                  } else if (value == 2) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const RoutePage();
-                    }));
-                  }
-                },
-              ),
-            ],
           ),
           body: Stack(
             children: [
@@ -159,7 +139,7 @@ Future<void> future() async {
                         String? cityname = await LocationService()
                             .getCurrentCityName(value, providerData);
                         _goToCurrentLocation(value.latitude, value.longitude);
-                     //   _loadMarkers(cityname);
+                        setMarkersFromSelectedPlaces();
                       });
                     },
                   ),
@@ -185,7 +165,8 @@ Future<void> future() async {
   }
   void CircleButtonOnClicked()
   {
-  latLen.clear();
+    if(_waitMapComplete)return;
+    latLen.clear();
    _markers.clear();
    _polyline.clear();
     future();
@@ -198,7 +179,11 @@ Future<void> future() async {
   }
 
   void placeListChanged() {
+    updateMap();
+  }
+   updateMap()async
+  {
+    await Future.delayed(Duration(milliseconds:50));
     CircleButtonOnClicked();
-    log("Place List Changed",level: 2);
   }
 }

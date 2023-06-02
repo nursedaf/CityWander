@@ -72,6 +72,7 @@ class LocaleDbManager {
       routes.remove(value);
       await addRoutes(routes);
     }
+    ObserverActions.instance.placeListChangeNotifier.notifyListeners();
   }
 
   void addPlaceToMap(String placeName, LatLng latLng) async {
@@ -118,6 +119,7 @@ class LocaleDbManager {
 
     placeMap?.remove(placeName);
     await _preferences?.setString('placeMap', jsonEncode(placeMap));
+    ObserverActions.instance.placeListChangeNotifier.notifyListeners();
   }
 }
 
