@@ -7,14 +7,12 @@ import 'package:citywander/service/local_db.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
-import 'package:citywander/route.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
 import 'Actions/ObserverActions.dart';
 import 'model/place_model.dart';
-import 'selected_places.dart';
+import 'search.dart';
 import 'service/place_service.dart';
 
   var _waitMapComplete=false;
@@ -118,6 +116,59 @@ Future<void> future() async {
           appBar: AppBar(
             title: const Text('CityWander'),
             backgroundColor: Colors.green[700],
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LocationSearchPage(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            /* actions: [
+              PopupMenuButton(
+                icon: const Icon(Icons.place),
+                position: PopupMenuPosition.under,
+                itemBuilder: (context1) {
+                  return [
+                    const PopupMenuItem<int>(
+                      value: 0,
+                      child: Text("City Places List"),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 1,
+                      child: Text("Selected Places"),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 2,
+                      child: Text("Your Route"),
+                    ),
+                  ];
+                },
+                onSelected: (value) {
+                  if (value == 0) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const PlaceList();
+                    }));
+                  } else if (value == 1) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const SelectedPlaces();
+                    }));
+                  } else if (value == 2) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const RoutePage();
+                    }));
+                  }
+                },
+              ),
+            ],*/
           ),
           body: Stack(
             children: [

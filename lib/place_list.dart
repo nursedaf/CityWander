@@ -86,7 +86,6 @@ class _PlaceListState extends State<PlaceList> {
                     return const CircularProgressIndicator();
                     // return const Text('No places to visit found.');
                   }
-                  //return const CircularProgressIndicator();
                 },
               ),
             ),
