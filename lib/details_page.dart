@@ -1,6 +1,4 @@
-
 import 'dart:developer';
-
 import 'package:citywander/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -25,7 +23,8 @@ class _DetailsPageState extends State<DetailsPage> {
     super.initState();
     routes = LocaleDbManager.instance.getLocations() ?? [];
   }
-  final notifier=ChangeNotifier();
+
+  final notifier = ChangeNotifier();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,8 +63,6 @@ class _DetailsPageState extends State<DetailsPage> {
     LocaleDbManager.instance.addRoute(LatLng(
         double.parse(selectedPlace.lat), double.parse(selectedPlace.lng)));
   }
-  
-  void placeMapUpdate(BuildContext context) {
 
-  }
+  void placeMapUpdate(BuildContext context) {}
 }

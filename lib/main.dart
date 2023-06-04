@@ -7,14 +7,12 @@ import 'package:citywander/service/local_db.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
-import 'package:citywander/route.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
 import 'Actions/ObserverActions.dart';
 import 'model/place_model.dart';
-import 'selected_places.dart';
+import 'search.dart';
 import 'service/place_service.dart';
 
   var _waitMapComplete=false;
@@ -63,50 +61,24 @@ class MapSampleState extends State<MapSample> {
     ObserverActions.instance.placeListChangeNotifier.addListener(placeListChanged);
   }
 
-Future<void> future() async {
-  _waitMapComplete=true;
-  try{
-    var futureCoordinates = await Directions.getDirections();
-    for (var coordinate in futureCoordinates) {
-      latLen.add(coordinate);
+  Location location = Location();
+  Future<void> _loadMarkers(String? cityname) async {
+    final places = await PlaceService().getPlace(cityname!);
+    if (places.isNotEmpty) {
+      final markers = places.map((place) {
+        return Marker(
+          markerId: MarkerId(place.name),
+          position: LatLng(double.parse(place.lat), double.parse(place.lng)),
+          infoWindow: InfoWindow(
+            title: place.name,
+            //snippet: place.info,
+          ),
+        );
+      }).toSet();
+      setState(() {
+        _markers = markers;
+      });
     }
-    await setMarkersFromSelectedPlaces();
-    setPolyline();
-  }
-  catch(e){
-    print("Future Problem");
-  }
-    _waitMapComplete=false;
-  }
- void setPolyline() {
-  var selectedPlaces = LocaleDbManager.instance.getLocations();
-     for (int i = 0; i < selectedPlaces!.length; i++) {
-        String id = i.toString();
-        _polyline.add(Polyline(
-          polylineId: PolylineId('route'+random.nextInt(100).toString()),
-          points: latLen,
-          color: const Color.fromARGB(255, 54, 18, 186),
-          width: 5,
-        ));
-      }
-    setState(() {
-    });
-  } 
-   Future<void> setMarkersFromSelectedPlaces() async {
-    Future<Map<String, dynamic>> selectedPlaces =
-        LocaleDbManager.instance.getPlaceMap();
-    var placeMap = await selectedPlaces;
-    placeMap.forEach((placeName, placeData) {
-      final latitude = placeData['latitude'];
-      final longitude = placeData['longitude'];
-      _markers.add(Marker(
-        markerId: MarkerId(placeName+random.nextInt(100).toString()),
-        position: LatLng(latitude, longitude),
-        infoWindow: InfoWindow(title: placeName),
-      ));
-    });
-    setState(() {
-    });
   }
   Location location = Location();
   @override
@@ -118,6 +90,46 @@ Future<void> future() async {
           appBar: AppBar(
             title: const Text('CityWander'),
             backgroundColor: Colors.green[700],
+            actions: [
+              PopupMenuButton(
+                icon: const Icon(Icons.place),
+                position: PopupMenuPosition.under,
+                itemBuilder: (context1) {
+                  return [
+                    const PopupMenuItem<int>(
+                      value: 0,
+                      child: Text("City Places List"),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 1,
+                      child: Text("Selected Places"),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 2,
+                      child: Text("Your Route"),
+                    ),
+                  ];
+                },
+                onSelected: (value) {
+                  if (value == 0) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const PlaceList();
+                    }));
+                  } else if (value == 1) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const SelectedPlaces();
+                    }));
+                  } else if (value == 2) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const RoutePage();
+                    }));
+                  }
+                },
+              ),
+            ],
           ),
           body: Stack(
             children: [
