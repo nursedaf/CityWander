@@ -7,16 +7,19 @@ import 'package:citywander/service/local_db.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
+import 'package:citywander/route.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
 import 'Actions/ObserverActions.dart';
 import 'model/place_model.dart';
 import 'search.dart';
+import 'selected_places.dart';
 import 'service/place_service.dart';
 
-  var _waitMapComplete=false;
-    var random=Random();
+var _waitMapComplete = false;
+var random = Random();
 void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ProviderData()),
@@ -46,7 +49,7 @@ class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   Set<Marker> _markers = {};
-   Set<Polyline> _polyline = {};
+  Set<Polyline> _polyline = {};
   late List<LatLng> latLen = [];
   late Future<List<Place>> futurePlaces;
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -57,76 +60,77 @@ class MapSampleState extends State<MapSample> {
   void initState() {
     super.initState();
     future();
-    ObserverActions.instance.placeListChangeNotifier.removeListener(placeListChanged);
-    ObserverActions.instance.placeListChangeNotifier.addListener(placeListChanged);
+    ObserverActions.instance.placeListChangeNotifier
+        .removeListener(placeListChanged);
+    ObserverActions.instance.placeListChangeNotifier
+        .addListener(placeListChanged);
   }
 
-  Location location = Location();
-  Future<void> _loadMarkers(String? cityname) async {
-    final places = await PlaceService().getPlace(cityname!);
-    if (places.isNotEmpty) {
-      final markers = places.map((place) {
-        return Marker(
-          markerId: MarkerId(place.name),
-          position: LatLng(double.parse(place.lat), double.parse(place.lng)),
-          infoWindow: InfoWindow(
-            title: place.name,
-            //snippet: place.info,
-          ),
-        );
-      }).toSet();
-      setState(() {
-        _markers = markers;
-      });
+  Future<void> future() async {
+    _waitMapComplete = true;
+    try {
+      var futureCoordinates = await Directions.getDirections();
+      for (var coordinate in futureCoordinates) {
+        latLen.add(coordinate);
+      }
+      await setMarkersFromSelectedPlaces();
+      setPolyline();
+    } catch (e) {
+      print("Future Problem");
     }
+    _waitMapComplete = false;
   }
+
+  void setPolyline() {
+    var selectedPlaces = LocaleDbManager.instance.getLocations();
+    for (int i = 0; i < selectedPlaces!.length; i++) {
+      String id = i.toString();
+      _polyline.add(Polyline(
+        polylineId: PolylineId('route' + random.nextInt(100).toString()),
+        points: latLen,
+        color: const Color.fromARGB(255, 54, 18, 186),
+        width: 5,
+      ));
+    }
+    setState(() {});
+  }
+
+  Future<void> setMarkersFromSelectedPlaces() async {
+    Future<Map<String, dynamic>> selectedPlaces =
+        LocaleDbManager.instance.getPlaceMap();
+    var placeMap = await selectedPlaces;
+    placeMap.forEach((placeName, placeData) {
+      final latitude = placeData['latitude'];
+      final longitude = placeData['longitude'];
+      _markers.add(Marker(
+        markerId: MarkerId(placeName + random.nextInt(100).toString()),
+        position: LatLng(latitude, longitude),
+        infoWindow: InfoWindow(title: placeName),
+      ));
+    });
+    setState(() {});
+  }
+
   Location location = Location();
   @override
   Widget build(BuildContext context) {
     ProviderData providerData = context.watch();
-   return MaterialApp(
+    return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
             title: const Text('CityWander'),
             backgroundColor: Colors.green[700],
             actions: [
-              PopupMenuButton(
-                icon: const Icon(Icons.place),
-                position: PopupMenuPosition.under,
-                itemBuilder: (context1) {
-                  return [
-                    const PopupMenuItem<int>(
-                      value: 0,
-                      child: Text("City Places List"),
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LocationSearchPage(),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 1,
-                      child: Text("Selected Places"),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 2,
-                      child: Text("Your Route"),
-                    ),
-                  ];
-                },
-                onSelected: (value) {
-                  if (value == 0) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const PlaceList();
-                    }));
-                  } else if (value == 1) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const SelectedPlaces();
-                    }));
-                  } else if (value == 2) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const RoutePage();
-                    }));
-                  }
+                  );
                 },
               ),
             ],
@@ -157,32 +161,58 @@ class MapSampleState extends State<MapSample> {
                   ),
                 ),
               ),
-              Align(alignment: Alignment.bottomLeft,
-              child:Padding(padding: EdgeInsets.only(left: 5,bottom: 5),child:Column(mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Transform.scale(scale:0.8,child: Container(decoration: BoxDecoration(color:const Color.fromARGB(255, 0, 0, 0),borderRadius: BorderRadius.circular(100)),child:IconButton(onPressed:placeListButtonOnClicked, icon: const Icon(Icons.list),color: Colors.white,),)),
-                Transform.scale(scale:0.8,child:  Container(decoration: BoxDecoration(color:const Color.fromARGB(255, 0, 0, 0),borderRadius: BorderRadius.circular(100)),child:IconButton(onPressed:CircleButtonOnClicked , icon: const Icon(Icons.circle),color: Colors.white),)),
-              ])) ,),
-    
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Padding(
+                    padding: EdgeInsets.only(left: 5, bottom: 5),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Transform.scale(
+                              scale: 0.8,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    borderRadius: BorderRadius.circular(100)),
+                                child: IconButton(
+                                  onPressed: placeListButtonOnClicked,
+                                  icon: const Icon(Icons.list),
+                                  color: Colors.white,
+                                ),
+                              )),
+                          Transform.scale(
+                              scale: 0.8,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    borderRadius: BorderRadius.circular(100)),
+                                child: IconButton(
+                                    onPressed: CircleButtonOnClicked,
+                                    icon: const Icon(Icons.circle),
+                                    color: Colors.white),
+                              )),
+                        ])),
+              ),
             ],
           ),
         ));
   }
-  void placeListButtonOnClicked()
-  {
- Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const PlaceList();
-                    }));
+
+  void placeListButtonOnClicked() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return const PlaceList();
+    }));
   }
-  void CircleButtonOnClicked()
-  {
-    if(_waitMapComplete)return;
+
+  void CircleButtonOnClicked() {
+    if (_waitMapComplete) return;
     latLen.clear();
-   _markers.clear();
-   _polyline.clear();
+    _markers.clear();
+    _polyline.clear();
     future();
   }
+
   Future<void> _goToCurrentLocation(double? latitude, double? longitude) async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -193,9 +223,9 @@ class MapSampleState extends State<MapSample> {
   void placeListChanged() {
     updateMap();
   }
-   updateMap()async
-  {
-    await Future.delayed(Duration(milliseconds:50));
+
+  updateMap() async {
+    await Future.delayed(Duration(milliseconds: 50));
     CircleButtonOnClicked();
   }
 }
