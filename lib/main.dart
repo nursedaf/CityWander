@@ -66,6 +66,12 @@ class MapSampleState extends State<MapSample> {
         .addListener(placeListChanged);
   }
 
+Future<void> future() async {
+  _waitMapComplete=true;
+  try{
+    var futureCoordinates = await Directions.getDirections();
+    for (var coordinate in futureCoordinates) {
+      latLen.add(coordinate);
   Future<void> future() async {
     _waitMapComplete = true;
     try {
@@ -133,7 +139,7 @@ class MapSampleState extends State<MapSample> {
                   );
                 },
               ),
-            ],
+            ],*/
           ),
           body: Stack(
             children: [

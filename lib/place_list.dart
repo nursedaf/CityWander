@@ -29,12 +29,9 @@ class _PlaceListState extends State<PlaceList> {
   void initState() {
     super.initState();
     providerData = Provider.of(context, listen: false);
-    ObserverActions.instance.placeListChangeNotifier
-        .removeListener(placeListChangeCallback);
-    ObserverActions.instance.placeListChangeNotifier
-        .addListener(placeListChangeCallback);
+    ObserverActions.instance.placeListChangeNotifier.removeListener(placeListChangeCallback);
+    ObserverActions.instance.placeListChangeNotifier.addListener(placeListChangeCallback);
     //  futurePlaces = PlaceService().getPlace(getCityName(providerData));
-    //futurePlaces = PlaceService().getPlace(getCityName(providerData));
     update();
   }
 
