@@ -2,15 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart';
 import 'package:location/location.dart';
-import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
-import 'package:citywander/route.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
 import 'model/place_model.dart';
-import 'selected_places.dart';
+import 'search.dart';
 import 'service/place_service.dart';
 
 void main() async {
@@ -56,7 +53,19 @@ class MapSampleState extends State<MapSample> {
     super.initState();
   }
 
+  /*void requestLocationPermission() async {
+    PermissionStatus permissionStatus = await location.hasPermission();
+    if (permissionStatus == PermissionStatus.denied) {
+      permissionStatus = await location.requestPermission();
+      if (permissionStatus != PermissionStatus.granted) {
+        // Handle permission not granted
+        return;
+      }
+    }
+  }*/
+
   Location location = Location();
+
   Future<void> _loadMarkers(String? cityname) async {
     final places = await PlaceService().getPlace(cityname!);
     if (places.isNotEmpty) {
@@ -87,6 +96,19 @@ class MapSampleState extends State<MapSample> {
             title: const Text('CityWander'),
             backgroundColor: Colors.green[700],
             actions: [
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LocationSearchPage(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            /* actions: [
               PopupMenuButton(
                 icon: const Icon(Icons.place),
                 position: PopupMenuPosition.under,
@@ -125,7 +147,7 @@ class MapSampleState extends State<MapSample> {
                   }
                 },
               ),
-            ],
+            ],*/
           ),
           body: Column(
             children: [

@@ -3,8 +3,6 @@ import 'package:citywander/route.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:citywander/service/local_db.dart';
-
-import 'main.dart';
 import 'place_list.dart';
 
 class SelectedPlaces extends StatefulWidget {

@@ -23,7 +23,7 @@ class _PlaceListState extends State<PlaceList> {
   void initState() {
     super.initState();
     providerData = Provider.of(context, listen: false);
-    //  futurePlaces = PlaceService().getPlace(getCityName(providerData));
+    //futurePlaces = PlaceService().getPlace(getCityName(providerData));
     update();
   }
 
@@ -73,7 +73,6 @@ class _PlaceListState extends State<PlaceList> {
                     return const CircularProgressIndicator();
                     // return const Text('No places to visit found.');
                   }
-                  //return const CircularProgressIndicator();
                 },
               ),
             ),
