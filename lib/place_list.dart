@@ -24,7 +24,7 @@ class _PlaceListState extends State<PlaceList> {
 
   ProviderData? providerData;
   String? title;
-  var _loadingData=true;
+  var _loadingData = true;
   @override
   void initState() {
     super.initState();
@@ -36,15 +36,16 @@ class _PlaceListState extends State<PlaceList> {
   }
 
   Future<void> update() async {
-    _loadingData=true;
+    _loadingData = true;
     var location = await Location().getLocation();
-    var cityName = await LocationService().getCurrentCityName(location, providerData!);
-    selectedPlaces=await LocaleDbManager.instance.getPlaceMap();
+    var cityName =
+        await LocationService().getCurrentCityName(location, providerData!);
+    selectedPlaces = await LocaleDbManager.instance.getPlaceMap();
     setState(() {
       title = cityName;
       futurePlaces = PlaceService().getPlace(cityName!);
     });
-    _loadingData=false;
+    _loadingData = false;
   }
 
   String getCityName(ProviderData? data) {
@@ -65,7 +66,7 @@ class _PlaceListState extends State<PlaceList> {
                 future: futurePlaces,
                 builder: (context, AsyncSnapshot snapshot) {
                   if (snapshot.hasData && snapshot.data != null) {
-                   _loadingData=false;
+                    _loadingData = false;
                     return ListView.separated(
                       separatorBuilder: (context, index) => const Divider(
                         color: Colors.black26,
@@ -73,13 +74,19 @@ class _PlaceListState extends State<PlaceList> {
                       itemCount: snapshot.data?.length ?? 0,
                       itemBuilder: (context, index) {
                         Place place = snapshot.data?[index];
-                        var selectedContains=selectedPlaces!.containsKey(place.name);
-                        List<Widget> childeren= <Widget>[];
-                         return  ListTile(
-                          onTap: ()=>listTileOnTap(context, place),
-                          title: Text(place.name),
-                          trailing:selectedContains?IconButton(onPressed:()=> placeDeleteButtonOnPressed(place), icon: const Icon (Icons.delete,color: Colors.red)): const Icon(Icons.chevron_right_outlined)
-                        );
+                        var selectedContains =
+                            selectedPlaces!.containsKey(place.name);
+                        List<Widget> childeren = <Widget>[];
+                        return ListTile(
+                            onTap: () => listTileOnTap(context, place),
+                            title: Text(place.name),
+                            trailing: selectedContains
+                                ? IconButton(
+                                    onPressed: () =>
+                                        placeDeleteButtonOnPressed(place),
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red))
+                                : const Icon(Icons.chevron_right_outlined));
                       },
                     );
                   } else {
@@ -107,24 +114,25 @@ class _PlaceListState extends State<PlaceList> {
                   itemIndex: null,
                 )));
   }
-  
-  placeDeleteButtonOnPressed(Place place) 
-  {
-    if(_loadingData)return;
-    log("PlaceDeleted!",level: 2);
+
+  placeDeleteButtonOnPressed(Place place) {
+    if (_loadingData) return;
+    log("PlaceDeleted!", level: 2);
     placeDeleter(place);
   }
-  placeDeleter(Place place) async{
-    await  LocaleDbManager.instance.deletePlaceFromMap(place.name);
-    await LocaleDbManager.instance.deleteRoute(LatLng(place.lat as double, place.lng as double));
+
+  placeDeleter(Place place) async {
+    await LocaleDbManager.instance.deletePlaceFromMap(place.name);
+    await LocaleDbManager.instance
+        .deleteRoute(LatLng(place.lat as double, place.lng as double));
   }
 
   void placeListChangeCallback() {
-   update();
+    update();
   }
-  
+
   listTileOnTap(BuildContext context, Place place) {
-    if(_loadingData)return;
-     openPage(context, place);
+    if (_loadingData) return;
+    openPage(context, place);
   }
 }

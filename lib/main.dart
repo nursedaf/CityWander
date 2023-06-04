@@ -68,43 +68,6 @@ Future<void> future() async {
     for (var coordinate in futureCoordinates) {
       latLen.add(coordinate);
     }
-    await setMarkersFromSelectedPlaces();
-    setPolyline();
-  }
-  catch(e){
-    print("Future Problem");
-  }
-    _waitMapComplete=false;
-  }
- void setPolyline() {
-  var selectedPlaces = LocaleDbManager.instance.getLocations();
-     for (int i = 0; i < selectedPlaces!.length; i++) {
-        String id = i.toString();
-        _polyline.add(Polyline(
-          polylineId: PolylineId('route'+random.nextInt(100).toString()),
-          points: latLen,
-          color: const Color.fromARGB(255, 54, 18, 186),
-          width: 5,
-        ));
-      }
-    setState(() {
-    });
-  } 
-   Future<void> setMarkersFromSelectedPlaces() async {
-    Future<Map<String, dynamic>> selectedPlaces =
-        LocaleDbManager.instance.getPlaceMap();
-    var placeMap = await selectedPlaces;
-    placeMap.forEach((placeName, placeData) {
-      final latitude = placeData['latitude'];
-      final longitude = placeData['longitude'];
-      _markers.add(Marker(
-        markerId: MarkerId(placeName+random.nextInt(100).toString()),
-        position: LatLng(latitude, longitude),
-        infoWindow: InfoWindow(title: placeName),
-      ));
-    });
-    setState(() {
-    });
   }
   Location location = Location();
   @override
@@ -117,19 +80,6 @@ Future<void> future() async {
             title: const Text('CityWander'),
             backgroundColor: Colors.green[700],
             actions: [
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LocationSearchPage(),
-                    ),
-                  );
-                },
-              ),
-            ],
-            /* actions: [
               PopupMenuButton(
                 icon: const Icon(Icons.place),
                 position: PopupMenuPosition.under,
