@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-import 'dart:ffi';
 import 'dart:math';
 import 'package:citywander/service/directions.dart';
 import 'package:citywander/service/local_db.dart';
@@ -9,14 +7,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
-import 'package:citywander/route.dart';
 import 'package:citywander/service/locationiq_serice.dart';
 import 'package:provider/provider.dart';
 import 'Actions/ObserverActions.dart';
 import 'model/place_model.dart';
 import 'search.dart';
-import 'selected_places.dart';
-import 'service/place_service.dart';
 
 var _waitMapComplete = false;
 var random = Random();

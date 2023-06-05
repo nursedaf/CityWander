@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 import 'package:citywander/main.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +43,11 @@ class _DetailsPageState extends State<DetailsPage> {
         backgroundColor: const Color.fromARGB(255, 9, 95, 12),
         onPressed: () {
           selected(widget.place);
+          late SnackBar snackBar = SnackBar(
+            content: Text('${widget.place.name} is added to the route.'),
+            duration: const Duration(seconds: 2),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         },
         label: const Text('Add to Route'),
       ),

@@ -173,7 +173,9 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
           ['location']['lat'];
       double lng = jsonDecode(response.body.toString())['result']['geometry']
           ['location']['lng'];
+      String placeName = jsonDecode(response.body.toString())['result']['name'];
       LocaleDbManager.instance.addRoute(LatLng(lat, lat));
+      LocaleDbManager.instance.addPlaceToMap(placeName, LatLng(lat, lat));
       print(LatLng(lat, lng));
     } else {
       print(response.reasonPhrase);

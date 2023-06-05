@@ -29,8 +29,10 @@ class _PlaceListState extends State<PlaceList> {
   void initState() {
     super.initState();
     providerData = Provider.of(context, listen: false);
-    ObserverActions.instance.placeListChangeNotifier.removeListener(placeListChangeCallback);
-    ObserverActions.instance.placeListChangeNotifier.addListener(placeListChangeCallback);
+    ObserverActions.instance.placeListChangeNotifier
+        .removeListener(placeListChangeCallback);
+    ObserverActions.instance.placeListChangeNotifier
+        .addListener(placeListChangeCallback);
     //  futurePlaces = PlaceService().getPlace(getCityName(providerData));
     update();
   }
@@ -58,6 +60,19 @@ class _PlaceListState extends State<PlaceList> {
         appBar: AppBar(
           title: Text(title ?? "Loading..."),
           backgroundColor: Colors.green[700],
+          actions: [
+            IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  LocaleDbManager.instance.clearAllValues();
+                  update();
+                  const snackBar = SnackBar(
+                    content: Text('All places and route deleted!'),
+                    duration: Duration(seconds: 2),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }),
+          ],
         ),
         body: RefreshIndicator(
             color: Colors.green[700],
@@ -76,14 +91,22 @@ class _PlaceListState extends State<PlaceList> {
                         Place place = snapshot.data?[index];
                         var selectedContains =
                             selectedPlaces!.containsKey(place.name);
-                        List<Widget> childeren = <Widget>[];
+
                         return ListTile(
                             onTap: () => listTileOnTap(context, place),
                             title: Text(place.name),
                             trailing: selectedContains
                                 ? IconButton(
-                                    onPressed: () =>
-                                        placeDeleteButtonOnPressed(place),
+                                    onPressed: () {
+                                      placeDeleteButtonOnPressed(place);
+                                      const snackBar = SnackBar(
+                                        content: Text(
+                                            'Selected place has been deleted!'),
+                                        duration: Duration(seconds: 2),
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    },
                                     icon: const Icon(Icons.delete,
                                         color: Colors.red))
                                 : const Icon(Icons.chevron_right_outlined));
@@ -124,7 +147,7 @@ class _PlaceListState extends State<PlaceList> {
   placeDeleter(Place place) async {
     await LocaleDbManager.instance.deletePlaceFromMap(place.name);
     await LocaleDbManager.instance
-        .deleteRoute(LatLng(place.lat as double, place.lng as double));
+        .deleteRoute(LatLng(double.parse(place.lat), double.parse(place.lng)));
   }
 
   void placeListChangeCallback() {
