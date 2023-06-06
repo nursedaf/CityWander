@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:citywander/Actions/ObserverActions.dart';
 import 'package:citywander/service/local_db.dart';
@@ -18,7 +19,7 @@ class PlaceList extends StatefulWidget {
 }
 
 class _PlaceListState extends State<PlaceList> {
-  Future<List<Place>>? futurePlaces;
+  Future<List<Place>>? basePlace;
   Map<String, dynamic>? selectedPlaces;
 
   ProviderData? providerData;
@@ -41,13 +42,13 @@ class _PlaceListState extends State<PlaceList> {
     var cityName =
         await LocationService().getCurrentCityName(location, providerData!);
     selectedPlaces = await LocaleDbManager.instance.getPlaceMap();
+
     setState(() {
       title = cityName;
-      futurePlaces = PlaceService().getPlace(cityName!);
+      basePlace=PlaceService().getPlace(cityName!);
     });
     _loadingData = false;
   }
-
   String getCityName(ProviderData? data) {
     return data?.placeName ?? "Mountain View";
   }
@@ -76,7 +77,7 @@ class _PlaceListState extends State<PlaceList> {
             color: Colors.green[700],
             child: Center(
               child: FutureBuilder<List<Place>>(
-                future: futurePlaces,
+                future: basePlace,
                 builder: (context, AsyncSnapshot snapshot) {
                   if (snapshot.hasData && snapshot.data != null) {
                     _loadingData = false;
@@ -87,13 +88,13 @@ class _PlaceListState extends State<PlaceList> {
                       itemCount: snapshot.data?.length ?? 0,
                       itemBuilder: (context, index) {
                         Place place = snapshot.data?[index];
-                        var selectedContains =
-                            selectedPlaces!.containsKey(place.name);
-
+                        var selectedContains = selectedPlaces!.containsKey(place.name);
+                        var isSearchedPlace=place.category=="9";
                         return ListTile(
-                            onTap: () => listTileOnTap(context, place),
+                            onTap: () =>{
+                          listTileOnTap(context, place)},
                             title: Text(place.name),
-                            trailing: selectedContains
+                            trailing:selectedContains|| isSearchedPlace
                                 ? IconButton(
                                     onPressed: () {
                                       placeDeleteButtonOnPressed(place);
@@ -107,7 +108,7 @@ class _PlaceListState extends State<PlaceList> {
                                     },
                                     icon: const Icon(Icons.delete,
                                         color: Colors.red))
-                                : const Icon(Icons.chevron_right_outlined));
+                                :!isSearchedPlace? const Icon(Icons.chevron_right_outlined):null);
                       },
                     );
                   } else {
@@ -118,10 +119,10 @@ class _PlaceListState extends State<PlaceList> {
               ),
             ),
             onRefresh: () async {
-              var places =
+              var placesBase =
                   await PlaceService().getPlace(getCityName(providerData));
               setState(() {
-                futurePlaces = Future.value(places);
+                basePlace = Future.value(placesBase);
               });
             }));
   }
@@ -136,6 +137,10 @@ class _PlaceListState extends State<PlaceList> {
     await LocaleDbManager.instance.deletePlaceFromMap(place.name);
     await LocaleDbManager.instance
         .deleteRoute(LatLng(double.parse(place.lat), double.parse(place.lng)));
+    if(place.category=="9")
+    {
+      await PlaceService().deletePlace(place);
+    }
   }
 
   void placeListChangeCallback() {
