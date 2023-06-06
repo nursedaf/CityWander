@@ -43,7 +43,7 @@ dependencies:
   provider: ^6.0.5
   shared_preferences: ^2.1.1
   uuid: ^3.0.7
-  
+  easy_debounce: ^2.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

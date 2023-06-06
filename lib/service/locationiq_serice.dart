@@ -4,7 +4,7 @@ import 'dart:convert';
 import '../providers/provider_data.dart';
 
 class LocationService {
-  Future<String?> getCurrentCityName(value, ProviderData providerData) async {
+  Future<String?> getCurrentCityName(value, ProviderData? providerData) async {
     var request = http.Request(
         'GET',
         Uri.parse(
@@ -17,7 +17,7 @@ class LocationService {
       debugPrint(jsonArray.toString());
       final String? cityName = jsonArray["address"]["province"];
       print('Current city name: $cityName');
-      providerData.placeName = cityName ?? "";
+      providerData?.placeName = cityName ?? "";
       return cityName;
     } else {
       print(response.reasonPhrase);

@@ -1,14 +1,15 @@
 import 'dart:convert';
 
+import 'package:citywander/place_list.dart';
+import 'package:citywander/service/locationiq_serice.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:easy_debounce/easy_debounce.dart';
 import 'model/place_model.dart';
 import 'service/local_db.dart';
-
 class LocationSearchPage extends StatefulWidget {
   const LocationSearchPage({super.key});
   @override
@@ -22,7 +23,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   List<dynamic> _placesList = [];
   late LocationData location;
   String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
-
+var _lastPlace;
   @override
   void initState() {
     super.initState();
@@ -37,25 +38,18 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         _sessionToken = uuid.v4();
       });
     }
-    suggestions(_controller.text);
-    /*if (_controller.text.length > 4) {
-      try {
-        location = await Location().getLocation();
-        final double? latitude = location.latitude;
-        final double? longitude = location.longitude;
-
-        Future<List> predictions =
-            getSuggesion(_controller.text, latitude!, longitude!);
-        setState(() {
-          predictions;
-        });
-      } catch (error) {
-        print('Error getting location: $error');
-      }
-     
-    }*/
+    EasyDebounce.debounce('textDebouncer',const Duration(milliseconds: 150),()=>debounceCallback());
   }
-
+  debounceCallback() async{
+    if(_lastPlace!= _controller.text)
+    {
+      _lastPlace=_controller.text;
+      var result=await getSuggesion(_controller.text);
+      setState(() {
+     _placesList=result;
+        });
+    }
+  }
   Future<void> suggestions(String input) async {
     String baseURL =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
@@ -72,21 +66,36 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     }
   }
 
-  Future<List> getSuggesion(
-      String input, double latitude, double longitude) async {
-    String baseURL =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-
-    String request =
-        '$baseURL?input=$input&location=$latitude,$longitude&radius=5000&key=$apiKey&sessiontoken=$_sessionToken';
+  Future<List<dynamic>> getSuggesion(
+      String input) async {
+        var currentLocation=await Location().getLocation();
+        var currentCity=await LocationService().getCurrentCityName( currentLocation,null);
+var lat=currentLocation.latitude;
+var long=currentLocation.longitude;
+var request="https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&location=$lat,$long&radius=500&key=AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks";
     var response = await http.get(Uri.parse(request));
 
     if (response.statusCode == 200) {
-      _placesList = jsonDecode(response.body.toString())['predictions'];
-      return _placesList;
-    } else {
+      var predictions = jsonDecode(response.body.toString())['predictions'];
+       var places = [];
+      for(var prediction in predictions)
+      {
+        var description = prediction['description'];
+      var terms = prediction['terms'];
+      for (var term in terms) {
+        if (term['value'] == currentCity) 
+        {
+          places.add(prediction);
+          break;
+        }
+      }
+      return places;
+    }
+    }
+     else {
       throw Exception('Failed to fetch directions');
     }
+      return [];
   }
 
   @override
@@ -144,7 +153,8 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                                       ElevatedButton(
                                         onPressed: () {
                                           select(
-                                              _placesList[index]['place_id']);
+                                              _placesList[index]['place_id']);   
+                                               Navigator.of(context).pop();
                                         },
                                         child: const Text('Add to Route'),
                                       ),
