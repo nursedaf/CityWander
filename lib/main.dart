@@ -8,6 +8,8 @@ import 'package:location/location.dart';
 import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
 import 'package:citywander/service/locationiq_serice.dart';
+import 'package:citywander/service/directions.dart';
+
 import 'package:provider/provider.dart';
 import 'Actions/ObserverActions.dart';
 import 'model/place_model.dart';
@@ -64,6 +66,8 @@ class MapSampleState extends State<MapSample> {
   Future<void> future() async {
     _waitMapComplete = true;
     try {
+      await LocaleDbManager.instance.locations();
+
       var futureCoordinates = await Directions.getDirections();
       for (var coordinate in futureCoordinates) {
         latLen.add(coordinate);
@@ -78,15 +82,12 @@ class MapSampleState extends State<MapSample> {
 
   void setPolyline() {
     var selectedPlaces = LocaleDbManager.instance.getLocations();
-    for (int i = 0; i < selectedPlaces!.length; i++) {
-      String id = i.toString();
-      _polyline.add(Polyline(
-        polylineId: PolylineId('route' + random.nextInt(100).toString()),
-        points: latLen,
-        color: const Color.fromARGB(255, 54, 18, 186),
-        width: 5,
-      ));
-    }
+    _polyline.add(Polyline(
+      polylineId: PolylineId('route${random.nextInt(100)}'),
+      points: latLen,
+      color: const Color.fromARGB(255, 54, 18, 186),
+      width: 5,
+    ));
     setState(() {});
   }
 

@@ -9,10 +9,10 @@ class Directions {
   static const String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
 
   static Future<List<LatLng>> getDirections() async {
-    List<LatLng>? latLngList = LocaleDbManager.instance.getLocations();
+    List<LatLng>? latLngList = await LocaleDbManager.instance.locations();
     List<double> latitudes = [];
     List<double> longitudes = [];
-    for (LatLng latLng in latLngList!) {
+    for (LatLng latLng in latLngList) {
       latitudes.add(latLng.latitude);
       longitudes.add(latLng.longitude);
     }

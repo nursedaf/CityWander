@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:citywander/Actions/ObserverActions.dart';
 import 'package:citywander/service/local_db.dart';
 import 'package:citywander/service/locationiq_serice.dart';
@@ -33,7 +32,6 @@ class _PlaceListState extends State<PlaceList> {
         .removeListener(placeListChangeCallback);
     ObserverActions.instance.placeListChangeNotifier
         .addListener(placeListChangeCallback);
-    //  futurePlaces = PlaceService().getPlace(getCityName(providerData));
     update();
   }
 
@@ -128,16 +126,6 @@ class _PlaceListState extends State<PlaceList> {
             }));
   }
 
-  static openPage(context, Place place) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => DetailsPage(
-                  place: place,
-                  itemIndex: null,
-                )));
-  }
-
   placeDeleteButtonOnPressed(Place place) {
     if (_loadingData) return;
     log("PlaceDeleted!", level: 2);
@@ -157,5 +145,15 @@ class _PlaceListState extends State<PlaceList> {
   listTileOnTap(BuildContext context, Place place) {
     if (_loadingData) return;
     openPage(context, place);
+  }
+
+  static openPage(context, Place place) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DetailsPage(
+                  place: place,
+                  itemIndex: null,
+                )));
   }
 }

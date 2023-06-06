@@ -39,6 +39,7 @@ class _DetailsPageState extends State<DetailsPage> {
         ),
         Text(widget.place.info)
       ])),
+      
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color.fromARGB(255, 9, 95, 12),
         onPressed: () {
@@ -69,5 +70,7 @@ class _DetailsPageState extends State<DetailsPage> {
         double.parse(selectedPlace.lat), double.parse(selectedPlace.lng)));
   }
 
-  void placeMapUpdate(BuildContext context) {}
+  void placeMapUpdate(BuildContext context) {
+    
+  }
 }

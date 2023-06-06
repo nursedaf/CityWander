@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Actions/ObserverActions.dart';
 
 import '../Actions/ObserverActions.dart';
+
 class LocaleDbManager {
   static final LocaleDbManager _instance = LocaleDbManager._init();
   SharedPreferences? _preferences;
@@ -17,7 +18,6 @@ class LocaleDbManager {
 
   static prefInit() async {
     instance._preferences ??= await SharedPreferences.getInstance();
-    return;
   }
 
   Future<void> setStringValue(PreferenceKeys key, String value) async {
@@ -47,17 +47,23 @@ class LocaleDbManager {
 
   Future<void> clearAllValues() async {
     await _preferences!.clear();
+    ObserverActions.instance.placeListChangeNotifier.notifyListeners();
   }
 
   List<LatLng>? getLocations() {
-    List<String> routes =
-        instance._preferences?.getStringList(PreferenceKeys.places.name) ?? [];
+    List<String> routes = _preferences?.getStringList("locations") ?? [];
+    return routes.map((e) => LatLng.fromJson(jsonDecode(e))!).toList();
+  }
+
+  Future<List<LatLng>> locations() async {
+    await prefInit();
+    List<String> routes = _preferences?.getStringList("locations") ?? [];
     return routes.map((e) => LatLng.fromJson(jsonDecode(e))!).toList();
   }
 
   Future<void> addRoutes(List<LatLng> values) async {
-    await instance._preferences?.setStringList(PreferenceKeys.places.name,
-        values.map((e) => e.toJson().toString()).toList());
+    await instance._preferences?.setStringList(
+        "locations", values.map((e) => e.toJson().toString()).toList());
   }
 
   Future<void> addRoute(LatLng value) async {
@@ -121,6 +127,40 @@ class LocaleDbManager {
 
     placeMap?.remove(placeName);
     await _preferences?.setString('placeMap', jsonEncode(placeMap));
+    ObserverActions.instance.placeListChangeNotifier.notifyListeners();
+  }
+
+  void addFromSearch(String placeName, LatLng latLng) async {
+    String? placeMapString = _preferences?.getString('searchmap');
+
+    Map<String, dynamic>? placeMap;
+    try {
+      placeMap = placeMapString != null ? jsonDecode(placeMapString) : {};
+    } catch (e) {
+      placeMap = {};
+    }
+    placeMap![placeName] = {
+      'latitude': latLng.latitude,
+      'longitude': latLng.longitude
+    };
+
+    await _preferences?.setString('searchmap', jsonEncode(placeMap));
+    ObserverActions.instance.placeListChangeNotifier.notifyListeners();
+    print('Place added to the map: $placeName');
+    print(placeMap);
+  }
+
+  Future<void> deleteFromSearch(String placeName) async {
+    String? placeMapString = _preferences?.getString('searchmap');
+    Map<String, dynamic>? placeMap;
+    try {
+      placeMap = placeMapString != null ? jsonDecode(placeMapString) : {};
+    } catch (e) {
+      placeMap = {};
+    }
+
+    placeMap?.remove(placeName);
+    await _preferences?.setString('searchmap', jsonEncode(placeMap));
     ObserverActions.instance.placeListChangeNotifier.notifyListeners();
   }
 }
