@@ -5,8 +5,7 @@ import 'package:citywander/model/place_model.dart';
 class PlaceService {
   Future<List<Place>> getPlace(String cityName) async {
     var headers = {'Content-Type': 'application/json'};
-    var request =
-        http.Request('POST', Uri.parse('http://nursedaf.com/travel_api/'));
+    var request =http.Request('POST', Uri.parse('http://nursedaf.com/travel_api/'));
     request.body = json.encode({
       "name": "places_in_city",
       "param": {"city_name": cityName}
@@ -26,6 +25,28 @@ class PlaceService {
         }
       }
       return list;
+    } else {
+      throw Exception("Failed");
+    }
+  }
+  Future<bool> setPlace(Place place) async {
+    var headers = {'Content-Type': 'application/json'};
+    var request =
+        http.Request('POST', Uri.parse('http://nursedaf.com/travel_api/'));
+    request.body = json.encode({
+      "name": "add_search_places",
+      "param": {
+      "place_name": place.name,
+      "place_lat":double.parse( place.lat),
+      "place_lng":double.parse(place.lng),
+      "place_city":1
+      }
+    });
+
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      return true;
     } else {
       throw Exception("Failed");
     }

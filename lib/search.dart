@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:citywander/place_list.dart';
 import 'package:citywander/service/locationiq_serice.dart';
+import 'package:citywander/service/place_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -22,6 +23,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   String _sessionToken = '123';
   List<dynamic> _placesList = [];
   late LocationData location;
+  
   String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
 var _lastPlace;
   @override
@@ -89,8 +91,8 @@ var request="https://maps.googleapis.com/maps/api/place/autocomplete/json?input=
           break;
         }
       }
-      return places;
     }
+      return places;
     }
      else {
       throw Exception('Failed to fetch directions');
@@ -184,6 +186,7 @@ var request="https://maps.googleapis.com/maps/api/place/autocomplete/json?input=
       double lng = jsonDecode(response.body.toString())['result']['geometry']
           ['location']['lng'];
       String placeName = jsonDecode(response.body.toString())['result']['name'];
+     await  PlaceService().setPlace( Place(name: placeName, info: "", lat: lat.toString(), lng: lng.toString(),category: "9"));
       LocaleDbManager.instance.addRoute(LatLng(lat, lng));
       LocaleDbManager.instance.addPlaceToMap(placeName, LatLng(lat, lng));
       LocaleDbManager.instance.addFromSearch(placeName, LatLng(lat, lng));

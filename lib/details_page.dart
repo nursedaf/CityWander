@@ -61,6 +61,7 @@ class _DetailsPageState extends State<DetailsPage> {
       lat: place.lat,
       lng: place.lng,
       info: place.info,
+      category: place.category
     );
     LocaleDbManager.instance.addPlaceToMap(
         selectedPlace.name,

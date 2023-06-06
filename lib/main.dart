@@ -83,7 +83,7 @@ class MapSampleState extends State<MapSample> {
   void setPolyline() {
     var selectedPlaces = LocaleDbManager.instance.getLocations();
     _polyline.add(Polyline(
-      polylineId: PolylineId('route${random.nextInt(100)}'),
+      polylineId: PolylineId('route'),
       points: latLen,
       color: const Color.fromARGB(255, 54, 18, 186),
       width: 5,

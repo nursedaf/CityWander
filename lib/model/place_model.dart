@@ -3,11 +3,13 @@ class Place {
   final String info;
   final String lat;
   final String lng;
+  final String category;
   Place({
     required this.name,
     required this.info,
     required this.lat,
     required this.lng,
+    required this.category
   });
 
   factory Place.fromJson(Map<String, dynamic> json) {
@@ -16,6 +18,7 @@ class Place {
       info: json['place_info'],
       lat: json['place_lat'],
       lng: json['place_lng'],
+      category: json['place_category']
     );
   }
 }
