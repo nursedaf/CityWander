@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:easy_debounce/easy_debounce.dart';
 import 'model/place_model.dart';
 import 'service/local_db.dart';
+
 class LocationSearchPage extends StatefulWidget {
   const LocationSearchPage({super.key});
   @override
@@ -23,9 +24,9 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   String _sessionToken = '123';
   List<dynamic> _placesList = [];
   late LocationData location;
-  
+
   String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
-var _lastPlace;
+  var _lastPlace;
   @override
   void initState() {
     super.initState();
@@ -40,18 +41,20 @@ var _lastPlace;
         _sessionToken = uuid.v4();
       });
     }
-    EasyDebounce.debounce('textDebouncer',const Duration(milliseconds: 150),()=>debounceCallback());
+    EasyDebounce.debounce('textDebouncer', const Duration(milliseconds: 150),
+        () => debounceCallback());
   }
-  debounceCallback() async{
-    if(_lastPlace!= _controller.text)
-    {
-      _lastPlace=_controller.text;
-      var result=await getSuggesion(_controller.text);
+
+  debounceCallback() async {
+    if (_lastPlace != _controller.text) {
+      _lastPlace = _controller.text;
+      var result = await getSuggesion(_controller.text);
       setState(() {
-     _placesList=result;
-        });
+        _placesList = result;
+      });
     }
   }
+
   Future<void> suggestions(String input) async {
     String baseURL =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
@@ -68,36 +71,34 @@ var _lastPlace;
     }
   }
 
-  Future<List<dynamic>> getSuggesion(
-      String input) async {
-        var currentLocation=await Location().getLocation();
-        var currentCity=await LocationService().getCurrentCityName( currentLocation,null);
-var lat=currentLocation.latitude;
-var long=currentLocation.longitude;
-var request="https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&location=$lat,$long&radius=500&key=AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks";
+  Future<List<dynamic>> getSuggesion(String input) async {
+    var currentLocation = await Location().getLocation();
+    var currentCity =
+        await LocationService().getCurrentCityName(currentLocation, null);
+    var lat = currentLocation.latitude;
+    var long = currentLocation.longitude;
+    var request =
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&location=$lat,$long&radius=500&key=AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks";
     var response = await http.get(Uri.parse(request));
 
     if (response.statusCode == 200) {
       var predictions = jsonDecode(response.body.toString())['predictions'];
-       var places = [];
-      for(var prediction in predictions)
-      {
+      var places = [];
+      for (var prediction in predictions) {
         var description = prediction['description'];
-      var terms = prediction['terms'];
-      for (var term in terms) {
-        if (term['value'] == currentCity) 
-        {
-          places.add(prediction);
-          break;
+        var terms = prediction['terms'];
+        for (var term in terms) {
+          if (term['value'] == currentCity) {
+            places.add(prediction);
+            break;
+          }
         }
       }
-    }
       return places;
-    }
-     else {
+    } else {
       throw Exception('Failed to fetch directions');
     }
-      return [];
+    return [];
   }
 
   @override
@@ -155,8 +156,8 @@ var request="https://maps.googleapis.com/maps/api/place/autocomplete/json?input=
                                       ElevatedButton(
                                         onPressed: () {
                                           select(
-                                              _placesList[index]['place_id']);   
-                                               Navigator.of(context).pop();
+                                              _placesList[index]['place_id']);
+                                          Navigator.of(context).pop();
                                         },
                                         child: const Text('Add to Route'),
                                       ),
@@ -186,7 +187,13 @@ var request="https://maps.googleapis.com/maps/api/place/autocomplete/json?input=
       double lng = jsonDecode(response.body.toString())['result']['geometry']
           ['location']['lng'];
       String placeName = jsonDecode(response.body.toString())['result']['name'];
-     await  PlaceService().setPlace( Place(name: placeName, info: "", lat: lat.toString(), lng: lng.toString(),category: "9"));
+      await PlaceService().setPlace(Place(
+          name: placeName,
+          info: "",
+          lat: lat.toString(),
+          lng: lng.toString(),
+          category: "9",
+          photo: ""));
       LocaleDbManager.instance.addRoute(LatLng(lat, lng));
       LocaleDbManager.instance.addPlaceToMap(placeName, LatLng(lat, lng));
       LocaleDbManager.instance.addFromSearch(placeName, LatLng(lat, lng));
