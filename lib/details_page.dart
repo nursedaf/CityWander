@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:citywander/model/place_model.dart';
 import 'package:citywander/service/local_db.dart';
 import 'package:provider/provider.dart';
-
 import 'Actions/ObserverActions.dart';
 
 class DetailsPage extends StatefulWidget {
@@ -34,12 +33,18 @@ class _DetailsPageState extends State<DetailsPage> {
       ),
       body: Center(
           child: Column(children: [
-        const SizedBox(
-          height: 30,
-        ),
-        Text(widget.place.info)
+        Text(widget.place.info),
+        if (widget.place.photo != null)
+          Image.network(
+            widget.place.photo!,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return const Center(child: Text('Loading...'));
+            },
+            errorBuilder: (context, error, stackTrace) => const Text(''),
+          ),
       ])),
-      
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color.fromARGB(255, 9, 95, 12),
         onPressed: () {
@@ -57,12 +62,12 @@ class _DetailsPageState extends State<DetailsPage> {
 
   void selected(Place place) {
     Place selectedPlace = Place(
-      name: place.name,
-      lat: place.lat,
-      lng: place.lng,
-      info: place.info,
-      category: place.category
-    );
+        name: place.name,
+        lat: place.lat,
+        lng: place.lng,
+        info: place.info,
+        category: place.category,
+        photo: place.photo);
     LocaleDbManager.instance.addPlaceToMap(
         selectedPlace.name,
         LatLng(
@@ -71,7 +76,5 @@ class _DetailsPageState extends State<DetailsPage> {
         double.parse(selectedPlace.lat), double.parse(selectedPlace.lng)));
   }
 
-  void placeMapUpdate(BuildContext context) {
-    
-  }
+  void placeMapUpdate(BuildContext context) {}
 }

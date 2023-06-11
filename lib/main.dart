@@ -8,15 +8,11 @@ import 'package:location/location.dart';
 import 'package:citywander/place_list.dart';
 import 'package:citywander/providers/provider_data.dart';
 import 'package:citywander/service/locationiq_serice.dart';
-import 'package:citywander/service/directions.dart';
-
 import 'package:provider/provider.dart';
 import 'Actions/ObserverActions.dart';
 import 'model/place_model.dart';
 import 'search.dart';
 
-var _waitMapComplete = false;
-var random = Random();
 void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ProviderData()),
@@ -53,6 +49,7 @@ class MapSampleState extends State<MapSample> {
     target: LatLng(39.9334, 32.8597),
     zoom: 14.4746,
   );
+  var _waitMapComplete = false;
   @override
   void initState() {
     super.initState();
@@ -91,6 +88,7 @@ class MapSampleState extends State<MapSample> {
     setState(() {});
   }
 
+  var intValue = Random().nextInt(1000);
   Future<void> setMarkersFromSelectedPlaces() async {
     Future<Map<String, dynamic>> selectedPlaces =
         LocaleDbManager.instance.getPlaceMap();
@@ -99,7 +97,7 @@ class MapSampleState extends State<MapSample> {
       final latitude = placeData['latitude'];
       final longitude = placeData['longitude'];
       _markers.add(Marker(
-        markerId: MarkerId(placeName + random.nextInt(100).toString()),
+        markerId: MarkerId(placeName + intValue.toString()),
         position: LatLng(latitude, longitude),
         infoWindow: InfoWindow(title: placeName),
       ));
@@ -133,7 +131,7 @@ class MapSampleState extends State<MapSample> {
           ),
           body: Stack(
             children: [
-              Expanded(
+              Positioned(
                 child: SafeArea(
                   child: GoogleMap(
                     initialCameraPosition: _kGooglePlex,
