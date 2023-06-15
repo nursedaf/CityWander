@@ -46,7 +46,8 @@ class MapSampleState extends State<MapSample> {
   late List<LatLng> latLen = [];
   late Future<List<Place>> futurePlaces;
   Map<String, dynamic>? searchedPlaces;
-
+  final markerColor =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(39.9334, 32.8597),
     zoom: 14.4746,
@@ -66,7 +67,6 @@ class MapSampleState extends State<MapSample> {
     _waitMapComplete = true;
     try {
       await LocaleDbManager.instance.locations();
-
       var futureCoordinates = await Directions.getDirections();
       for (var coordinate in futureCoordinates) {
         latLen.add(coordinate);
@@ -90,7 +90,6 @@ class MapSampleState extends State<MapSample> {
     setState(() {});
   }
 
-  var intValue = Random().nextInt(1000);
   Future<void> setMarkersFromSelectedPlaces() async {
     Future<Map<String, dynamic>> selectedPlaces =
         LocaleDbManager.instance.getPlaceMap();
@@ -99,12 +98,21 @@ class MapSampleState extends State<MapSample> {
       final latitude = placeData['latitude'];
       final longitude = placeData['longitude'];
       _markers.add(Marker(
-        markerId: MarkerId(placeName + intValue.toString()),
+        markerId: MarkerId(placeName + Random().nextInt(100000).toString()),
         position: LatLng(latitude, longitude),
         infoWindow: InfoWindow(title: placeName),
       ));
     });
     setState(() {});
+  }
+
+  void _setMarker(LatLng point) {
+    setState(() {
+      _markers.add(Marker(
+          markerId: const MarkerId('current location'),
+          position: point,
+          icon: markerColor));
+    });
   }
 
   Location location = Location();
@@ -160,16 +168,16 @@ class MapSampleState extends State<MapSample> {
               Align(
                 alignment: Alignment.bottomLeft,
                 child: Padding(
-                    padding: const EdgeInsets.only(left: 5, bottom: 5),
+                    padding: const EdgeInsets.only(left: 7, bottom: 7),
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Transform.scale(
-                              scale: 0.8,
+                              scale: 1,
                               child: Container(
                                 decoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    color: const Color.fromARGB(255, 9, 95, 12),
                                     borderRadius: BorderRadius.circular(100)),
                                 child: IconButton(
                                   onPressed: placeListButtonOnClicked,
@@ -178,14 +186,14 @@ class MapSampleState extends State<MapSample> {
                                 ),
                               )),
                           Transform.scale(
-                              scale: 0.8,
+                              scale: 1,
                               child: Container(
                                 decoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    color: const Color.fromARGB(255, 9, 95, 12),
                                     borderRadius: BorderRadius.circular(100)),
                                 child: IconButton(
-                                    onPressed: CircleButtonOnClicked,
-                                    icon: const Icon(Icons.circle),
+                                    onPressed: routeButtonOnClicked,
+                                    icon: const Icon(Icons.directions),
                                     color: Colors.white),
                               )),
                         ])),
@@ -201,7 +209,7 @@ class MapSampleState extends State<MapSample> {
     }));
   }
 
-  void CircleButtonOnClicked() {
+  void routeButtonOnClicked() {
     if (_waitMapComplete) return;
     latLen.clear();
     _markers.clear();
@@ -213,7 +221,7 @@ class MapSampleState extends State<MapSample> {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: LatLng(latitude!, longitude!), zoom: 15)));
-    //_setMarker(LatLng(latitude, longitude));
+    _setMarker(LatLng(latitude, longitude));
   }
 
   void placeListChanged() {
@@ -221,8 +229,8 @@ class MapSampleState extends State<MapSample> {
   }
 
   updateMap() async {
-    await Future.delayed(Duration(milliseconds: 50));
-    CircleButtonOnClicked();
+    await Future.delayed(const Duration(milliseconds: 50));
+    routeButtonOnClicked();
   }
 
   String generateRandomPolylineId() {

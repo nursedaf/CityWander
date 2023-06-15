@@ -158,6 +158,14 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                                           select(
                                               _placesList[index]['place_id']);
                                           Navigator.of(context).pop();
+                                          late SnackBar snackBar = SnackBar(
+                                            content: Text(
+                                                '${_placesList[index]["structured_formatting"]["main_text"]} is added to the route.'),
+                                            duration:
+                                                const Duration(seconds: 2),
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
                                         },
                                         child: const Text('Add to Route'),
                                       ),
