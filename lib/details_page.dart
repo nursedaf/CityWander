@@ -31,9 +31,9 @@ class _DetailsPageState extends State<DetailsPage> {
         backgroundColor: const Color.fromARGB(255, 9, 95, 12),
         title: Text(widget.place.name),
       ),
-      body: Center(
-          child: Column(children: [
-        Text(widget.place.info),
+      body: SingleChildScrollView(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         if (widget.place.photo != null)
           Image.network(
             widget.place.photo!,
@@ -44,6 +44,15 @@ class _DetailsPageState extends State<DetailsPage> {
             },
             errorBuilder: (context, error, stackTrace) => const Text(''),
           ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            widget.place.info,
+            style: const TextStyle(
+              fontSize: 16.0,
+            ),
+          ),
+        )
       ])),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color.fromARGB(255, 9, 95, 12),

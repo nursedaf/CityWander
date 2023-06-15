@@ -45,6 +45,8 @@ class MapSampleState extends State<MapSample> {
   Set<Polyline> _polyline = {};
   late List<LatLng> latLen = [];
   late Future<List<Place>> futurePlaces;
+  Map<String, dynamic>? searchedPlaces;
+
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(39.9334, 32.8597),
     zoom: 14.4746,
@@ -78,9 +80,9 @@ class MapSampleState extends State<MapSample> {
   }
 
   void setPolyline() {
-    var selectedPlaces = LocaleDbManager.instance.getLocations();
+    //var selectedPlaces = LocaleDbManager.instance.locations();
     _polyline.add(Polyline(
-      polylineId: PolylineId('route'),
+      polylineId: PolylineId(generateRandomPolylineId()),
       points: latLen,
       color: const Color.fromARGB(255, 54, 18, 186),
       width: 5,
@@ -158,7 +160,7 @@ class MapSampleState extends State<MapSample> {
               Align(
                 alignment: Alignment.bottomLeft,
                 child: Padding(
-                    padding: EdgeInsets.only(left: 5, bottom: 5),
+                    padding: const EdgeInsets.only(left: 5, bottom: 5),
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,5 +223,12 @@ class MapSampleState extends State<MapSample> {
   updateMap() async {
     await Future.delayed(Duration(milliseconds: 50));
     CircleButtonOnClicked();
+  }
+
+  String generateRandomPolylineId() {
+    Random random = Random();
+    int randomNumber =
+        random.nextInt(100000); // Adjust the range as per your requirement
+    return 'polyline_$randomNumber';
   }
 }

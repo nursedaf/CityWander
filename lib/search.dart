@@ -107,7 +107,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       appBar: AppBar(
           backgroundColor: Colors.green[700],
           elevation: 0,
-          title: const Text('Search Place')),
+          title: const Text('Search Place in')),
       body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
@@ -180,23 +180,15 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     String request =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placesId&key=$apiKey';
     var response = await http.get(Uri.parse(request));
-
     if (response.statusCode == 200) {
       double lat = jsonDecode(response.body.toString())['result']['geometry']
           ['location']['lat'];
       double lng = jsonDecode(response.body.toString())['result']['geometry']
           ['location']['lng'];
       String placeName = jsonDecode(response.body.toString())['result']['name'];
-      await PlaceService().setPlace(Place(
-          name: placeName,
-          info: "",
-          lat: lat.toString(),
-          lng: lng.toString(),
-          category: "9",
-          photo: ""));
       LocaleDbManager.instance.addRoute(LatLng(lat, lng));
       LocaleDbManager.instance.addPlaceToMap(placeName, LatLng(lat, lng));
-      LocaleDbManager.instance.addFromSearch(placeName, LatLng(lat, lng));
+      LocaleDbManager.instance.addSearchtoList(placeName, LatLng(lat, lng));
       print(LatLng(lat, lng));
     } else {
       print(response.reasonPhrase);

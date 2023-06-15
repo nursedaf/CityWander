@@ -21,6 +21,7 @@ class PlaceList extends StatefulWidget {
 class _PlaceListState extends State<PlaceList> {
   Future<List<Place>>? basePlace;
   Map<String, dynamic>? selectedPlaces;
+  Map<String, dynamic>? searchedPlaces;
 
   ProviderData? providerData;
   String? title;
@@ -42,13 +43,14 @@ class _PlaceListState extends State<PlaceList> {
     var cityName =
         await LocationService().getCurrentCityName(location, providerData!);
     selectedPlaces = await LocaleDbManager.instance.getPlaceMap();
-
+    searchedPlaces = await LocaleDbManager.instance.getSearchedPlaces();
     setState(() {
       title = cityName;
-      basePlace=PlaceService().getPlace(cityName!);
+      basePlace = convertToPlaces(cityName!, searchedPlaces!);
     });
     _loadingData = false;
   }
+
   String getCityName(ProviderData? data) {
     return data?.placeName ?? "Mountain View";
   }
@@ -88,13 +90,14 @@ class _PlaceListState extends State<PlaceList> {
                       itemCount: snapshot.data?.length ?? 0,
                       itemBuilder: (context, index) {
                         Place place = snapshot.data?[index];
-                        var selectedContains = selectedPlaces!.containsKey(place.name);
-                        var isSearchedPlace=place.category=="9";
+                        var selectedContains =
+                            selectedPlaces!.containsKey(place.name);
+                        var searchedContains =
+                            searchedPlaces!.containsKey(place.name);
                         return ListTile(
-                            onTap: () =>{
-                          listTileOnTap(context, place)},
+                            onTap: () => {listTileOnTap(context, place)},
                             title: Text(place.name),
-                            trailing:selectedContains|| isSearchedPlace
+                            trailing: selectedContains || searchedContains
                                 ? IconButton(
                                     onPressed: () {
                                       placeDeleteButtonOnPressed(place);
@@ -108,7 +111,9 @@ class _PlaceListState extends State<PlaceList> {
                                     },
                                     icon: const Icon(Icons.delete,
                                         color: Colors.red))
-                                :!isSearchedPlace? const Icon(Icons.chevron_right_outlined):null);
+                                : !searchedContains
+                                    ? const Icon(Icons.chevron_right_outlined)
+                                    : null);
                       },
                     );
                   } else {
@@ -137,9 +142,8 @@ class _PlaceListState extends State<PlaceList> {
     await LocaleDbManager.instance.deletePlaceFromMap(place.name);
     await LocaleDbManager.instance
         .deleteRoute(LatLng(double.parse(place.lat), double.parse(place.lng)));
-    if(place.category=="9")
-    {
-      await PlaceService().deletePlace(place);
+    if (place.category == "9") {
+      await LocaleDbManager.instance.deleteFromSearch(place.name);
     }
   }
 
@@ -160,5 +164,40 @@ class _PlaceListState extends State<PlaceList> {
                   place: place,
                   itemIndex: null,
                 )));
+  }
+
+  Future<List<Place>> convertToPlaces(
+      String cityName, Map<String, dynamic> searchedPlaces) async {
+    List<Place> places = [];
+    Future<List<Place>> basePlaceItems = PlaceService().getPlace(cityName);
+    List<Place> basePlaces = await basePlaceItems;
+
+    // Append the base place items to the existing list
+    places.addAll(basePlaces);
+
+    searchedPlaces.forEach((key, value) {
+      // Extract the values from the map
+      String name = value['name'];
+      String info = value['info'];
+      String lat = value['lat'];
+      String lng = value['lng'];
+      String category = value['category'];
+      String photo = value['photo'];
+
+      // Create a Place object
+      Place place = Place(
+        name: name,
+        info: info,
+        lat: lat,
+        lng: lng,
+        category: category,
+        photo: photo,
+      );
+
+      // Add the Place object to the list
+      places.add(place);
+    });
+
+    return places;
   }
 }

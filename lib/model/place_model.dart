@@ -4,7 +4,7 @@ class Place {
   final String lat;
   final String lng;
   final String category;
-  final String? photo;
+  late final String? photo;
   Place({
     required this.name,
     required this.info,
