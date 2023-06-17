@@ -2,7 +2,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 Future<List<String>> getPlacePredictions(String input) async {
-  // Replace YOUR_API_KEY with your actual Google Places API key
   String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
   String url =
       'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&key=$apiKey';

@@ -72,14 +72,14 @@ class MapSampleState extends State<MapSample> {
         latLen.add(coordinate);
       }
       await setMarkersFromSelectedPlaces();
-      setPolyline();
+      setPolyline(latLen);
     } catch (e) {
       print("Future Problem");
     }
     _waitMapComplete = false;
   }
 
-  void setPolyline() {
+  void setPolyline(List<LatLng> latLen) {
     //var selectedPlaces = LocaleDbManager.instance.locations();
     _polyline.add(Polyline(
       polylineId: PolylineId(generateRandomPolylineId()),
