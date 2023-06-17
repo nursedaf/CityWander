@@ -45,7 +45,7 @@ class _PlaceListState extends State<PlaceList> {
     selectedPlaces = await LocaleDbManager.instance.getPlaceMap();
     searchedPlaces = await LocaleDbManager.instance.getSearchedPlaces();
     setState(() {
-      title = cityName;
+      title = "Places in $cityName";
       basePlace = convertToPlaces(cityName!, searchedPlaces!);
     });
     _loadingData = false;
@@ -171,12 +171,9 @@ class _PlaceListState extends State<PlaceList> {
     List<Place> places = [];
     Future<List<Place>> basePlaceItems = PlaceService().getPlace(cityName);
     List<Place> basePlaces = await basePlaceItems;
-
-    // Append the base place items to the existing list
     places.addAll(basePlaces);
 
     searchedPlaces.forEach((key, value) {
-      // Extract the values from the map
       String name = value['name'];
       String info = value['info'];
       String lat = value['lat'];
@@ -184,7 +181,6 @@ class _PlaceListState extends State<PlaceList> {
       String category = value['category'];
       String photo = value['photo'];
 
-      // Create a Place object
       Place place = Place(
         name: name,
         info: info,
@@ -193,11 +189,8 @@ class _PlaceListState extends State<PlaceList> {
         category: category,
         photo: photo,
       );
-
-      // Add the Place object to the list
       places.add(place);
     });
-
     return places;
   }
 }

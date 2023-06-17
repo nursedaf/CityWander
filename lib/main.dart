@@ -235,8 +235,7 @@ class MapSampleState extends State<MapSample> {
 
   String generateRandomPolylineId() {
     Random random = Random();
-    int randomNumber =
-        random.nextInt(100000); // Adjust the range as per your requirement
+    int randomNumber = random.nextInt(100000);
     return 'polyline_$randomNumber';
   }
 }

@@ -1,11 +1,7 @@
-import 'dart:developer';
-import 'package:citywander/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:citywander/model/place_model.dart';
 import 'package:citywander/service/local_db.dart';
-import 'package:provider/provider.dart';
-import 'Actions/ObserverActions.dart';
 
 class DetailsPage extends StatefulWidget {
   final Place place;

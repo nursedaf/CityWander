@@ -1,11 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Actions/ObserverActions.dart';
-
-import '../Actions/ObserverActions.dart';
-import '../model/place_model.dart';
 
 class LocaleDbManager {
   static final LocaleDbManager _instance = LocaleDbManager._init();

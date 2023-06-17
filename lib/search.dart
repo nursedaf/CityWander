@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:uuid/uuid.dart';
-import 'package:http/http.dart' as http;
 import 'package:easy_debounce/easy_debounce.dart';
-import 'service/local_db.dart';
+import 'providers/provider_data.dart';
+import 'service/locationiq_serice.dart';
 import 'service/search_service.dart';
 
 class LocationSearchPage extends StatefulWidget {
@@ -15,7 +13,7 @@ class LocationSearchPage extends StatefulWidget {
 }
 
 class _LocationSearchPageState extends State<LocationSearchPage> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   var uuid = const Uuid();
   String _sessionToken = '123';
   List<dynamic> _placesList = [];
@@ -32,6 +30,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   }
 
   void onChange() {
+    // ignore: unnecessary_null_comparison
     if (_sessionToken == null) {
       setState(() {
         _sessionToken = uuid.v4();
@@ -55,9 +54,10 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.green[700],
-          elevation: 0,
-          title: const Text('Search Place in')),
+        backgroundColor: Colors.green[700],
+        elevation: 0,
+        title: const Text("Search Place in City"),
+      ),
       body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
@@ -133,6 +133,4 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
           )),
     );
   }
-
-  
 }
