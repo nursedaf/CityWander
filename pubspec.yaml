@@ -42,8 +42,8 @@ dependencies:
   maps_launcher: ^2.2.0
   provider: ^6.0.5
   shared_preferences: ^2.1.1
-  url_launcher: ^6.1.11
-  
+  uuid: ^3.0.7
+  easy_debounce: ^2.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

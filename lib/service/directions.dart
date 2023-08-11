@@ -1,20 +1,18 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'local_db.dart';
 import 'package:location/location.dart';
 
 class Directions {
-  static const String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
+  static const String apiKey = 'GOOGLEAPIKEY';
 
   static Future<List<LatLng>> getDirections() async {
-    List<LatLng>? latLngList = LocaleDbManager.instance.getLocations();
+    List<LatLng>? latLngList = await LocaleDbManager.instance.locations();
     List<double> latitudes = [];
     List<double> longitudes = [];
-    for (LatLng latLng in latLngList!) {
+    for (LatLng latLng in latLngList) {
       latitudes.add(latLng.latitude);
       longitudes.add(latLng.longitude);
     }

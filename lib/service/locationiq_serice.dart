@@ -4,11 +4,11 @@ import 'dart:convert';
 import '../providers/provider_data.dart';
 
 class LocationService {
-  Future<String?> getCurrentCityName(value, ProviderData providerData) async {
+  Future<String?> getCurrentCityName(value, ProviderData? providerData) async {
     var request = http.Request(
         'GET',
         Uri.parse(
-            'https://us1.locationiq.com/v1/reverse?key=pk.dfa80f49ddb4de55708387e659cc8600&lat=${value.latitude}&lon=${value.longitude}&format=json'));
+            'https://us1.locationiq.com/v1/reverse?key=LOCATIONAPIKEY&lat=${value.latitude}&lon=${value.longitude}&format=json'));
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
@@ -17,7 +17,7 @@ class LocationService {
       debugPrint(jsonArray.toString());
       final String? cityName = jsonArray["address"]["province"];
       print('Current city name: $cityName');
-      providerData.placeName = cityName ?? "";
+      providerData?.placeName = cityName ?? "";
       return cityName;
     } else {
       print(response.reasonPhrase);
