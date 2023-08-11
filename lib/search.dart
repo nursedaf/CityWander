@@ -19,7 +19,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   List<dynamic> _placesList = [];
   late LocationData location;
 
-  String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
+  String apiKey = 'GOOGLEAPIKEY';
   var _lastPlace;
   @override
   void initState() {

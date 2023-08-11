@@ -5,7 +5,7 @@ import 'package:location/location.dart';
 import 'local_db.dart';
 import 'locationiq_serice.dart';
 
-String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
+String apiKey = 'GOOGLEAPIKEY';
 
 Future<List<dynamic>> getSuggesion(String input) async {
   var currentLocation = await Location().getLocation();

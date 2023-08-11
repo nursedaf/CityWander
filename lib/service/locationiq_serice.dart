@@ -8,7 +8,7 @@ class LocationService {
     var request = http.Request(
         'GET',
         Uri.parse(
-            'https://us1.locationiq.com/v1/reverse?key=pk.dfa80f49ddb4de55708387e659cc8600&lat=${value.latitude}&lon=${value.longitude}&format=json'));
+            'https://us1.locationiq.com/v1/reverse?key=LOCATIONAPIKEY&lat=${value.latitude}&lon=${value.longitude}&format=json'));
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
