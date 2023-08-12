@@ -6,7 +6,7 @@ import 'local_db.dart';
 import 'package:location/location.dart';
 
 class Directions {
-  static const String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
+  static const String apiKey = 'GOOGLE_API_KEY';
 
   static Future<List<LatLng>> getDirections() async {
     List<LatLng>? latLngList = LocaleDbManager.instance.getLocations();
