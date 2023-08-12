@@ -21,7 +21,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   String _sessionToken = '123';
   List<dynamic> _placesList = [];
   late LocationData location;
-  String apiKey = 'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks';
+  String apiKey = 'GOOGLE_API_KEY';
 
   @override
   void initState() {
