@@ -39,29 +39,6 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  /*Future<List<LatLng>?> _fetchDirections() async {
-    LatLng origin =
-        LatLng(37.7749, -122.4194); // Replace with your origin coordinates
-    LatLng destination =
-        LatLng(34.0522, -118.2437); // Replace with your destination coordinates
-
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      'AIzaSyDrKMpYg-2dDhcdXLG6Y4Cd31dvOIEa3Ks',
-      PointLatLng(origin.latitude, origin.longitude),
-      PointLatLng(destination.latitude, destination.longitude),
-    );
-
-    if (result.points.isNotEmpty) {
-      List<LatLng> route = result.points
-          .map((point) => LatLng(point.latitude, point.longitude))
-          .toList();
-
-      setState(() {
-        _route = route;
-      });
-    }
-  }*/
-
   Location location = Location();
 
   @override
